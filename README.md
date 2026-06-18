@@ -1,215 +1,190 @@
-<h1 align="center">MiMoCode</h1>
+<h1 align="center">MiMoCode — Multimodal Bridge</h1>
 
 <p align="center">
   <img src="assets/readme/mimocode-banner.png" alt="MiMoCode" width="700">
 </p>
 
-<p align="center"><strong>MiMo Code: Where Models and Agents Co-Evolve</strong></p>
+<p align="center"><strong>让 mimo-v2.5-pro 能"看图"的多模态桥接版本</strong></p>
 
 <p align="center">
   <a href="README.zh.md">中文</a> | English
 </p>
 
-<p align="center">
-  <a href="https://mimo.xiaomi.com/en/mimocode">Website</a> | <a href="https://mimo.xiaomi.com/en/blog/mimo-code-long-horizon">Blog</a>
-</p>
+---
+
+## 这是什么？
+
+我是一个独立开发者，在用 MiMo Code 的 mimo-v2.5-pro 模型写代码时发现一个问题：**v2.5-pro 推理能力很强，但它不能看图片**。每次粘贴截图（报错信息、UI 设计稿、架构图）都会报 `ERROR: Cannot read "clipboard" (this model does not support image input)`。
+
+所以我做了一个**多模态桥接**：把图片先发给 mimo-v2.5（视觉模型）分析，生成详细的文字描述，再把描述传给 v2.5-pro 推理。这样 v2.5-pro 就能间接"理解"图片内容了。
+
+```
+你发送图片 + 文字
+       │
+       ▼
+mimo-v2.5（视觉模型）──→ 分析图片，生成文字描述
+       │
+       ▼
+mimo-v2.5-pro（推理模型）──→ 结合文字描述进行深度推理
+       │
+       ▼
+智能回复 ──→ 代码分析、Bug 修复、架构建议
+```
+
+## 怎么用？
+
+### 1. 下载
+
+从 [Releases](https://github.com/ccwbb78/mimo-code-Multimodal-integration/releases) 下载 `mimocode-windows-x64.zip`，解压后运行 `mimo.exe`。
+
+### 2. 开启多模态桥接
+
+在项目目录下创建 `.mimocode/mimocode.json`：
+
+```json
+{
+  "experimental": {
+    "multimodal_bridge": true
+  }
+}
+```
+
+或者在 TUI 里按 `Ctrl+P` 打开命令面板，找到「多模态整合」点击切换。
+
+### 3. 使用
+
+直接 `Ctrl+V` 粘贴图片，模型会自动分析。终端里会看到日志：
+
+```
+[multimodal bridge] sending 1 image(s) to vision model for analysis
+[multimodal bridge: vision model resolved] visionModel: mimo-v2.5
+```
+
+### 自定义视觉模型
+
+如果你的 provider 里视觉模型不叫 `mimo-v2.5`，可以手动指定：
+
+```json
+{
+  "experimental": {
+    "multimodal_bridge": true,
+    "multimodal_bridge_vision_model": "your-vision-model-id"
+  }
+}
+```
 
 ---
 
-MiMoCode is a terminal-native AI coding assistant. It can read and write code, run commands, manage Git, and use a persistent memory system to keep a deep understanding of your project across sessions while continuously improving itself.
+## 原版功能
 
-MiMo Auto is built in as a free-for-limited-time channel, so you can start with zero configuration. MiMoCode also supports connecting to any mainstream LLM provider API.
+以下是 MiMo Code 原有的功能，全部保留：
 
----
-
-## Quick Start
+### 快速开始
 
 ```bash
-# One-line install
+# 一键安装
 curl -fsSL https://mimo.xiaomi.com/install | bash
 
-# Or install via npm
+# 或通过 npm
 npm install -g @mimo-ai/cli
 
-# Run
+# 运行
 mimo
 ```
 
-The first launch guides you through configuration automatically. Supported options:
-- **MiMo Auto (free for a limited time)** — anonymous channel, zero configuration
-- **Xiaomi MiMo Platform** — OAuth login
-- **Import from Claude Code** — migrate existing authentication in one step
-- **Custom Provider** — add any OpenAI-compatible API in the TUI
+首次启动会自动引导配置：
+- **MiMo Auto（限时免费）** — 匿名通道，零配置
+- **小米 MiMo 平台** — OAuth 登录
+- **从 Claude Code 导入** — 一步迁移已有认证
+- **自定义 Provider** — 在 TUI 中添加任何 OpenAI 兼容 API
 
-<details>
-<summary><strong>WSL: clipboard issues</strong></summary>
+### 多 Agent 系统
 
-If you encounter garbled text when copying on WSL, install `xsel`:
-```bash
-sudo apt install xsel
-```
-</details>
-
----
-
-## Core Features
-
-### Multiple Agents
-
-| Agent | Description |
+| Agent | 说明 |
 |--------|------|
-| **build** | Default. Full tool permissions for development |
-| **plan** | Read-only analysis mode for code exploration and solution design |
-| **compose** | Orchestration mode for specs-driven development and skill-driven workflows |
+| **build** | 默认，完整工具权限，用于开发 |
+| **plan** | 只读分析模式，用于代码探索和方案设计 |
+| **compose** | 编排模式，用于规范驱动开发和技能工作流 |
 
-Press `Tab` to switch between primary agents. Subagents are created by the system as needed.
+按 `Tab` 切换主 Agent。子 Agent 由系统按需创建。
 
-### Persistent Memory
+### 持久化记忆
 
-Cross-session memory powered by SQLite FTS5 full-text search:
+基于 SQLite FTS5 全文搜索的跨会话记忆：
 
-- **Project memory** (`MEMORY.md`) — persistent project knowledge, rules, and architecture decisions
-- **Session checkpoint** (`checkpoint.md`) — structured state snapshots maintained automatically by the checkpoint-writer subagent
-- **Scratch notes** (`notes.md`) — temporary note area for agents
-- **Task progress** (`tasks/<id>/progress.md`) — per-task logs
+- **项目记忆** (`MEMORY.md`) — 持久化的项目知识、规则和架构决策
+- **会话检查点** (`checkpoint.md`) — 由检查点写入子 Agent 自动维护的结构化状态快照
+- **临时笔记** (`notes.md`) — Agent 的临时记录区
+- **任务进度** (`tasks/<id>/progress.md`) — 每个任务的日志
 
-Memory is injected automatically when a session resumes, so the agent does not need to relearn project context.
+会话恢复时记忆自动注入，Agent 无需重新学习项目上下文。
 
-### Intelligent Context Management
+### 智能上下文管理
 
-- **Automatic checkpoints** — decides when to save session state based on the model context window
-- **Context reconstruction** — when context approaches the limit, rebuilds it from the latest checkpoint, project memory, task progress, and retained recent messages so the agent can continue the current task
-- **Budgeted injection** — uses a token budget to control how much checkpoint, memory, and notes content enters context, with importance ranking
+- **自动检查点** — 根据模型上下文窗口决定何时保存会话状态
+- **上下文重建** — 接近限制时从最新检查点、项目记忆、任务进度和保留的近期消息重建上下文
+- **预算注入** — 使用 token 预算控制进入上下文的检查点、记忆和笔记内容量
 
-### Task Tracking
+### 任务追踪
 
-A tree-shaped task system (`T1`, `T1.1`, `T1.2`, …) that integrates automatically with the checkpoint system, so task progress is preserved when sessions resume.
+树形任务系统（`T1`、`T1.1`、`T1.2`、…），自动与检查点系统集成，会话恢复时任务进度得以保留。
 
-### Subagent System
+### 子 Agent 系统
 
-The primary agent can create subagents on demand. Subagents share the current session context and can work in parallel, with lifecycle tracking, cancellation, and background execution.
+主 Agent 可按需创建子 Agent。子 Agent 共享当前会话上下文，支持并行工作、生命周期跟踪、取消和后台执行。
 
-### Goal / Stop Condition
+### Goal / 停止条件
 
-The `/goal` command sets a stopping condition for a session. When the agent tries to stop, an independent judge model evaluates the conversation to decide whether the condition is truly satisfied — preventing premature "optimistic stops" during autonomous work.
+`/goal` 命令设置会话的停止条件。当 Agent 尝试停止时，独立的评判模型会评估对话以判断条件是否真正满足——防止自主工作中过早的"乐观停止"。
 
-### Compose Mode
+### Compose 模式
 
-Compose mode provides a structured workflow for specs-driven development. It includes built-in skills for planning, execution, code review, TDD, debugging, verification, and merging — orchestrating the full lifecycle from spec to shipped code.
+为规范驱动开发提供结构化工作流，包含规划、执行、代码审查、TDD、调试、验证和合并的内置技能。
 
-### Voice Input
+### 语音输入
 
-Real-time streaming voice input powered by TenVAD and MiMo ASR. Activate with `/voice`, then speak — audio is segmented by pauses and transcribed incrementally into the input. Available for MiMo logged-in users. Requires `sox` (`brew install sox` on macOS, other platforms similar).
-
-<details>
-<summary><strong>WSLg audio setup</strong></summary>
-
-```bash
-sudo apt install -y sox pulseaudio libasound2-plugins
-export PULSE_SERVER=unix:/mnt/wslg/PulseServer
-```
-</details>
-
-<details>
-<summary><strong>SSH remote audio (Mac → remote host)</strong></summary>
-
-```bash
-# Mac (local)
-brew install pulseaudio
-pulseaudio --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1" --exit-idle-time=-1 --daemonize
-# Add to ~/.ssh/config: RemoteForward 4713 127.0.0.1:4713
-
-# Remote host
-apt install -y pulseaudio pulseaudio-utils sox
-export PULSE_SERVER=tcp:127.0.0.1:4713
-# Verify: pactl info
-```
-</details>
-
-<details>
-<summary><strong>Non-MiMo voice providers (OpenRouter, internal API, etc.)</strong></summary>
-
-Voice input can route through other OpenAI-compatible providers via the `voice` config field. The ASR model (`mimo-v2.5-asr`) is only available on MiMo's platform; voice control mode (`mimo-v2.5`) is available on OpenRouter and compatible relay platforms.
-
-**OpenRouter (voice control only):**
-
-Use `/connect` to sign in to OpenRouter, then add to your config:
-```jsonc
-{
-  "voice": {
-    "control_model": "openrouter/xiaomi/mimo-v2.5"
-  }
-}
-```
-
-**Internal / self-hosted relay (both ASR and voice control):**
-```jsonc
-{
-  "provider": {
-    "internal": {
-      "options": {
-        "baseURL": "https://your-api-gateway.example.com/v1",
-        "apiKey": "sk-..."
-      },
-      "models": {
-        "xiaomi/mimo-v2.5-asr": { "name": "MiMo-V2.5-ASR" },
-        "xiaomi/mimo-v2.5": { "name": "MiMo-V2.5" }
-      }
-    }
-  },
-  "voice": {
-    "asr_model": "internal/xiaomi/mimo-v2.5-asr",
-    "control_model": "internal/xiaomi/mimo-v2.5"
-  }
-}
-```
-
-Custom providers must register at least one model in their `models` field to be recognized. The model names in `voice.*_model` are sent directly to the API — they don't need to match the registered model keys exactly.
-
-> **Note:** Models registered under a custom provider will appear in the model selection list. Don't use ASR-only models (e.g. `mimo-v2.5-asr`) as your primary coding model.
-
-</details>
+基于 TenVAD 和 MiMo ASR 的实时流式语音输入。`/voice` 激活后直接说话，音频按停顿分段并增量转写。
 
 ### Dream & Distill
 
-- **`/dream`** — scans recent session traces, extracts persistent knowledge into project memory, and removes outdated entries
-- **`/distill`** — discovers repeated manual workflows in recent work and packages high-confidence candidates into reusable skills, subagents, or commands
+- **`/dream`** — 扫描近期会话轨迹，提取持久知识到项目记忆
+- **`/distill`** — 发现重复的手动工作流并打包为可复用的技能、子 Agent 或命令
 
 ---
 
-## Configuration
+## 配置
 
-MiMoCode is configured via `.mimocode/mimocode.json` in the project directory (or `~/.config/mimocode/mimocode.json` globally). Key options include:
+通过项目目录下的 `.mimocode/mimocode.json` 配置（或全局 `~/.config/mimocode/mimocode.json`）：
 
-- Provider and model selection
-- Agent permissions and custom agents
-- Checkpoint and memory behavior
-- MCP server connections
-- Keybindings and theme
+- Provider 和模型选择
+- Agent 权限和自定义 Agent
+- 检查点和记忆行为
+- MCP 服务器连接
+- 快捷键和主题
 
-Max Mode (parallel best-of-N reasoning with judge selection) can be enabled via `experimental.maxMode` in the config.
+Max Mode（并行 best-of-N 推理 + 评判选择）可通过 `experimental.maxMode` 开启。
 
 ---
 
-## Development
+## 开发
 
 ```bash
-bun install              # Install dependencies
-bun run dev              # Run in development mode
-bun turbo typecheck      # Type check
+bun install              # 安装依赖
+bun run dev              # 开发模式运行
+bun turbo typecheck      # 类型检查
 ```
 
 ---
 
-## Relationship to OpenCode
+## 与 OpenCode 的关系
 
-MiMoCode is built as a fork of [OpenCode](https://github.com/XiaomiMiMo/MiMo-Code). It keeps all core OpenCode capabilities (multiple providers, TUI, LSP, MCP, plugins) and adds persistent memory, intelligent context management, subagent orchestration, goal-driven autonomous loops, compose workflows, and self-improvement via dream/distill.
+MiMo Code 基于 [OpenCode](https://github.com/XiaomiMiMo/MiMo-Code) 的 fork 构建。保留了 OpenCode 的所有核心能力（多 Provider、TUI、LSP、MCP、插件），并添加了持久化记忆、智能上下文管理、子 Agent 编排、目标驱动自主循环、Compose 工作流以及 dream/distill 自我改进。
 
 ---
 
-## Community
+## 社区
 
-Scan the QR code to join the community group chat:
+扫码加入社区群聊：
 
 <p align="center">
   <img src="assets/readme/community-qrcode.jpg" alt="Community group chat QR code" width="240">
@@ -217,10 +192,10 @@ Scan the QR code to join the community group chat:
 
 ---
 
-## License
+## 许可证
 
-Source code is licensed under the [MIT License](./LICENSE).
+源代码采用 [MIT 许可证](./LICENSE)。
 
-Use of MiMoCode is also subject to the [Use Restrictions](./USE_RESTRICTIONS.md).
-Use of Xiaomi MiMo-hosted services is subject to the [MiMo Terms of Service](https://platform.xiaomimimo.com/docs/terms/user-agreement).
-Use of the MiMo name, logo, and trademarks is subject to the MiMo Trademark Policy.
+使用 MiMo Code 还需遵守 [使用限制](./USE_RESTRICTIONS.md)。
+使用小米 MiMo 托管服务需遵守 [MiMo 服务条款](https://platform.xiaomimimo.com/docs/terms/user-agreement)。
+使用 MiMo 名称、标志和商标需遵守 MiMo 商标政策。
