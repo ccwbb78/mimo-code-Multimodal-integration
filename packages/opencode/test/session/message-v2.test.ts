@@ -429,7 +429,7 @@ describe("session.message-v2.toModelMessage", () => {
       },
     ]
 
-    const result = ProviderTransform.message(await MessageV2.toModelMessages(input, anthropicModel), anthropicModel, {})
+    const result = await ProviderTransform.message(await MessageV2.toModelMessages(input, anthropicModel), anthropicModel, {})
     expect(result).toHaveLength(3)
     expect(result[2].role).toBe("tool")
     expect(result[2].content[0]).toMatchObject({

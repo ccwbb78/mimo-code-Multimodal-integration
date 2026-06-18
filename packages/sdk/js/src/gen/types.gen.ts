@@ -1370,6 +1370,14 @@ export type Config = {
      * Tools that should only be available to primary agents.
      */
     primary_tools?: Array<string>
+    /**
+     * Enable multimodal bridge for mimo/xiaomi v2.5-pro models.
+     */
+    multimodal_bridge?: boolean
+    /**
+     * Vision model ID for the multimodal bridge.
+     */
+    multimodal_bridge_vision_model?: string
   }
 }
 

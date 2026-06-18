@@ -2272,6 +2272,14 @@ export type Config = {
        */
       candidates?: number
     }
+    /**
+     * Enable multimodal bridge for mimo/xiaomi v2.5-pro models. When enabled, images are sent to mimo-v2.5 (vision model) for analysis, and the text description is passed to v2.5-pro (reasoning model). Default: false.
+     */
+    multimodal_bridge?: boolean
+    /**
+     * Vision model ID for the multimodal bridge. Defaults to 'mimo-v2.5'. Change this if your provider uses a different model ID for the vision-capable model.
+     */
+    multimodal_bridge_vision_model?: string
   }
   /**
    * Dynamic workflow runtime settings.

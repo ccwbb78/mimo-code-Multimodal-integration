@@ -37,7 +37,7 @@ describe("ProviderTransform.options - setCacheKey", () => {
     headers: {},
   } as any
 
-  test("should set promptCacheKey when providerOptions.setCacheKey is true", () => {
+  test("should set promptCacheKey when providerOptions.setCacheKey is true", async () => {
     const result = ProviderTransform.options({
       model: mockModel,
       sessionID,
@@ -46,7 +46,7 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBe(sessionID)
   })
 
-  test("should not set promptCacheKey when providerOptions.setCacheKey is false", () => {
+  test("should not set promptCacheKey when providerOptions.setCacheKey is false", async () => {
     const result = ProviderTransform.options({
       model: mockModel,
       sessionID,
@@ -55,7 +55,7 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBeUndefined()
   })
 
-  test("should not set promptCacheKey when providerOptions is undefined", () => {
+  test("should not set promptCacheKey when providerOptions is undefined", async () => {
     const result = ProviderTransform.options({
       model: mockModel,
       sessionID,
@@ -64,12 +64,12 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBeUndefined()
   })
 
-  test("should not set promptCacheKey when providerOptions does not have setCacheKey", () => {
+  test("should not set promptCacheKey when providerOptions does not have setCacheKey", async () => {
     const result = ProviderTransform.options({ model: mockModel, sessionID, providerOptions: {} })
     expect(result.promptCacheKey).toBeUndefined()
   })
 
-  test("should set promptCacheKey for openai provider regardless of setCacheKey", () => {
+  test("should set promptCacheKey for openai provider regardless of setCacheKey", async () => {
     const openaiModel = {
       ...mockModel,
       providerID: "openai",
@@ -83,7 +83,7 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.promptCacheKey).toBe(sessionID)
   })
 
-  test("should set store=false for openai provider", () => {
+  test("should set store=false for openai provider", async () => {
     const openaiModel = {
       ...mockModel,
       providerID: "openai",
@@ -101,7 +101,7 @@ describe("ProviderTransform.options - setCacheKey", () => {
     expect(result.store).toBe(false)
   })
 
-  test("should set store=true for azure provider by default", () => {
+  test("should set store=true for azure provider by default", async () => {
     const azureModel = {
       ...mockModel,
       providerID: "azure",
@@ -147,7 +147,7 @@ describe("ProviderTransform.maxOutputTokens", () => {
     release_date: "2026-01-01",
   }
 
-  test("uses 128K for mimo provider models", () => {
+  test("uses 128K for mimo provider models", async () => {
     expect(
       ProviderTransform.maxOutputTokens({
         ...baseModel,
@@ -157,7 +157,7 @@ describe("ProviderTransform.maxOutputTokens", () => {
     ).toBe(128_000)
   })
 
-  test("uses 128K for xiaomi provider models", () => {
+  test("uses 128K for xiaomi provider models", async () => {
     expect(
       ProviderTransform.maxOutputTokens({
         ...baseModel,
@@ -167,7 +167,7 @@ describe("ProviderTransform.maxOutputTokens", () => {
     ).toBe(128_000)
   })
 
-  test("keeps the default cap for non-mimo models", () => {
+  test("keeps the default cap for non-mimo models", async () => {
     expect(ProviderTransform.maxOutputTokens({ ...baseModel, limit: { context: 1_000_000, output: 64_000 } })).toBe(
       32_000,
     )
@@ -262,7 +262,7 @@ describe("ProviderTransform.options - google thinkingConfig gating", () => {
       headers: {},
     }) as any
 
-  test("does not set thinkingConfig for google models without reasoning capability", () => {
+  test("does not set thinkingConfig for google models without reasoning capability", async () => {
     const result = ProviderTransform.options({
       model: createGoogleModel(false, "@ai-sdk/google"),
       sessionID,
@@ -271,7 +271,7 @@ describe("ProviderTransform.options - google thinkingConfig gating", () => {
     expect(result.thinkingConfig).toBeUndefined()
   })
 
-  test("sets thinkingConfig for google models with reasoning capability", () => {
+  test("sets thinkingConfig for google models with reasoning capability", async () => {
     const result = ProviderTransform.options({
       model: createGoogleModel(true, "@ai-sdk/google"),
       sessionID,
@@ -282,7 +282,7 @@ describe("ProviderTransform.options - google thinkingConfig gating", () => {
     })
   })
 
-  test("does not set thinkingConfig for vertex models without reasoning capability", () => {
+  test("does not set thinkingConfig for vertex models without reasoning capability", async () => {
     const result = ProviderTransform.options({
       model: createGoogleModel(false, "@ai-sdk/google-vertex"),
       sessionID,
@@ -321,43 +321,43 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
       headers: {},
     }) as any
 
-  test("gpt-5.2 should have textVerbosity set to low", () => {
+  test("gpt-5.2 should have textVerbosity set to low", async () => {
     const model = createGpt5Model("gpt-5.2")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBe("low")
   })
 
-  test("gpt-5.1 should have textVerbosity set to low", () => {
+  test("gpt-5.1 should have textVerbosity set to low", async () => {
     const model = createGpt5Model("gpt-5.1")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBe("low")
   })
 
-  test("gpt-5.2-chat-latest should NOT have textVerbosity set (only supports medium)", () => {
+  test("gpt-5.2-chat-latest should NOT have textVerbosity set (only supports medium)", async () => {
     const model = createGpt5Model("gpt-5.2-chat-latest")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
   })
 
-  test("gpt-5.1-chat-latest should NOT have textVerbosity set (only supports medium)", () => {
+  test("gpt-5.1-chat-latest should NOT have textVerbosity set (only supports medium)", async () => {
     const model = createGpt5Model("gpt-5.1-chat-latest")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
   })
 
-  test("gpt-5.2-chat should NOT have textVerbosity set", () => {
+  test("gpt-5.2-chat should NOT have textVerbosity set", async () => {
     const model = createGpt5Model("gpt-5.2-chat")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
   })
 
-  test("gpt-5-chat should NOT have textVerbosity set", () => {
+  test("gpt-5-chat should NOT have textVerbosity set", async () => {
     const model = createGpt5Model("gpt-5-chat")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
   })
 
-  test("gpt-5.2-codex should NOT have textVerbosity set (codex models excluded)", () => {
+  test("gpt-5.2-codex should NOT have textVerbosity set (codex models excluded)", async () => {
     const model = createGpt5Model("gpt-5.2-codex")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
@@ -401,7 +401,7 @@ describe("ProviderTransform.options - gateway", () => {
       release_date: "2024-01-01",
     }) as any
 
-  test("puts gateway defaults under gateway key", () => {
+  test("puts gateway defaults under gateway key", async () => {
     const model = createModel("anthropic/claude-sonnet-4")
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result).toEqual({
@@ -448,7 +448,7 @@ describe("ProviderTransform.providerOptions", () => {
       ...overrides,
     }) as any
 
-  test("uses sdk key for non-gateway models", () => {
+  test("uses sdk key for non-gateway models", async () => {
     const model = createModel({
       providerID: "my-bedrock",
       api: {
@@ -463,7 +463,7 @@ describe("ProviderTransform.providerOptions", () => {
     })
   })
 
-  test("uses gateway model provider slug for gateway models", () => {
+  test("uses gateway model provider slug for gateway models", async () => {
     const model = createModel({
       providerID: "vercel",
       api: {
@@ -478,7 +478,7 @@ describe("ProviderTransform.providerOptions", () => {
     })
   })
 
-  test("falls back to gateway key when gateway api id is unscoped", () => {
+  test("falls back to gateway key when gateway api id is unscoped", async () => {
     const model = createModel({
       id: "anthropic/claude-sonnet-4",
       providerID: "vercel",
@@ -494,7 +494,7 @@ describe("ProviderTransform.providerOptions", () => {
     })
   })
 
-  test("splits gateway routing options from provider-specific options", () => {
+  test("splits gateway routing options from provider-specific options", async () => {
     const model = createModel({
       providerID: "vercel",
       api: {
@@ -515,7 +515,7 @@ describe("ProviderTransform.providerOptions", () => {
     } as any)
   })
 
-  test("falls back to gateway key when model id has no provider slug", () => {
+  test("falls back to gateway key when model id has no provider slug", async () => {
     const model = createModel({
       id: "claude-sonnet-4",
       providerID: "vercel",
@@ -531,7 +531,7 @@ describe("ProviderTransform.providerOptions", () => {
     })
   })
 
-  test("maps amazon slug to bedrock for provider options", () => {
+  test("maps amazon slug to bedrock for provider options", async () => {
     const model = createModel({
       providerID: "vercel",
       api: {
@@ -546,7 +546,7 @@ describe("ProviderTransform.providerOptions", () => {
     })
   })
 
-  test("uses groq slug for groq models", () => {
+  test("uses groq slug for groq models", async () => {
     const model = createModel({
       providerID: "vercel",
       api: {
@@ -563,7 +563,7 @@ describe("ProviderTransform.providerOptions", () => {
 })
 
 describe("ProviderTransform.schema - gemini array items", () => {
-  test("adds missing items for array properties", () => {
+  test("adds missing items for array properties", async () => {
     const geminiModel = {
       providerID: "google",
       api: {
@@ -594,7 +594,7 @@ describe("ProviderTransform.schema - gemini nested array items", () => {
     },
   } as any
 
-  test("adds type to 2D array with empty inner items", () => {
+  test("adds type to 2D array with empty inner items", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -614,7 +614,7 @@ describe("ProviderTransform.schema - gemini nested array items", () => {
     expect(result.properties.values.items.items.type).toBe("string")
   })
 
-  test("adds items and type to 2D array with missing inner items", () => {
+  test("adds items and type to 2D array with missing inner items", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -631,7 +631,7 @@ describe("ProviderTransform.schema - gemini nested array items", () => {
     expect(result.properties.data.items.items.type).toBe("string")
   })
 
-  test("handles deeply nested arrays (3D)", () => {
+  test("handles deeply nested arrays (3D)", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -654,7 +654,7 @@ describe("ProviderTransform.schema - gemini nested array items", () => {
     expect(result.properties.matrix.items.items.items.type).toBe("string")
   })
 
-  test("preserves existing item types in nested arrays", () => {
+  test("preserves existing item types in nested arrays", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -674,7 +674,7 @@ describe("ProviderTransform.schema - gemini nested array items", () => {
     expect(result.properties.numbers.items.items.type).toBe("number")
   })
 
-  test("handles mixed nested structures with objects and arrays", () => {
+  test("handles mixed nested structures with objects and arrays", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -719,7 +719,7 @@ describe("ProviderTransform.schema - gemini combiner nodes", () => {
     Object.entries(node).forEach(([key, value]) => walk(value, cb, [...path, key]))
   }
 
-  test("keeps edits.items.anyOf without adding type", () => {
+  test("keeps edits.items.anyOf without adding type", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -757,7 +757,7 @@ describe("ProviderTransform.schema - gemini combiner nodes", () => {
     expect(result.properties.edits.items.type).toBeUndefined()
   })
 
-  test("does not add sibling keys to combiner nodes during sanitize", () => {
+  test("does not add sibling keys to combiner nodes during sanitize", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -807,7 +807,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     },
   } as any
 
-  test("removes properties from non-object types", () => {
+  test("removes properties from non-object types", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -824,7 +824,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     expect(result.properties.data.properties).toBeUndefined()
   })
 
-  test("removes required from non-object types", () => {
+  test("removes required from non-object types", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -842,7 +842,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     expect(result.properties.data.required).toBeUndefined()
   })
 
-  test("removes properties and required from nested non-object types", () => {
+  test("removes properties and required from nested non-object types", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -866,7 +866,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     expect(result.properties.outer.properties.inner.required).toBeUndefined()
   })
 
-  test("keeps properties and required on object types", () => {
+  test("keeps properties and required on object types", async () => {
     const schema = {
       type: "object",
       properties: {
@@ -885,7 +885,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     expect(result.properties.data.required).toEqual(["name"])
   })
 
-  test("does not affect non-gemini providers", () => {
+  test("does not affect non-gemini providers", async () => {
     const openaiModel = {
       providerID: "openai",
       api: {
@@ -910,7 +910,7 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
 })
 
 describe("ProviderTransform.message - DeepSeek reasoning content", () => {
-  test("DeepSeek with tool calls includes reasoning_content in providerOptions", () => {
+  test("DeepSeek with tool calls includes reasoning_content in providerOptions", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -926,7 +926,7 @@ describe("ProviderTransform.message - DeepSeek reasoning content", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(
+    const result = await ProviderTransform.message(
       msgs,
       {
         id: ModelID.make("deepseek/deepseek-chat"),
@@ -977,7 +977,7 @@ describe("ProviderTransform.message - DeepSeek reasoning content", () => {
     expect(result[0].providerOptions?.openaiCompatible?.reasoning_content).toBe("Let me think about this...")
   })
 
-  test("Non-DeepSeek providers leave reasoning content unchanged", () => {
+  test("Non-DeepSeek providers leave reasoning content unchanged", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -988,7 +988,7 @@ describe("ProviderTransform.message - DeepSeek reasoning content", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(
+    const result = await ProviderTransform.message(
       msgs,
       {
         id: ModelID.make("openai/gpt-4"),
@@ -1066,7 +1066,7 @@ describe("ProviderTransform.message - empty image handling", () => {
     headers: {},
   } as any
 
-  test("should replace empty base64 image with error text", () => {
+  test("should replace empty base64 image with error text", async () => {
     const msgs = [
       {
         role: "user",
@@ -1077,7 +1077,7 @@ describe("ProviderTransform.message - empty image handling", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, mockModel, {})
+    const result = await ProviderTransform.message(msgs, mockModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(2)
@@ -1088,7 +1088,7 @@ describe("ProviderTransform.message - empty image handling", () => {
     })
   })
 
-  test("should keep valid base64 images unchanged", () => {
+  test("should keep valid base64 images unchanged", async () => {
     const validBase64 =
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
     const msgs = [
@@ -1101,7 +1101,7 @@ describe("ProviderTransform.message - empty image handling", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, mockModel, {})
+    const result = await ProviderTransform.message(msgs, mockModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(2)
@@ -1109,7 +1109,7 @@ describe("ProviderTransform.message - empty image handling", () => {
     expect(result[0].content[1]).toEqual({ type: "image", image: `data:image/png;base64,${validBase64}` })
   })
 
-  test("should handle mixed valid and empty images", () => {
+  test("should handle mixed valid and empty images", async () => {
     const validBase64 =
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
     const msgs = [
@@ -1123,7 +1123,7 @@ describe("ProviderTransform.message - empty image handling", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, mockModel, {})
+    const result = await ProviderTransform.message(msgs, mockModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(3)
@@ -1169,21 +1169,21 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     headers: {},
   } as any
 
-  test("filters out messages with empty string content", () => {
+  test("filters out messages with empty string content", async () => {
     const msgs = [
       { role: "user", content: "Hello" },
       { role: "assistant", content: "" },
       { role: "user", content: "World" },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(2)
     expect(result[0].content).toBe("Hello")
     expect(result[1].content).toBe("World")
   })
 
-  test("filters out empty text parts from array content", () => {
+  test("filters out empty text parts from array content", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1195,14 +1195,14 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(1)
     expect(result[0].content[0]).toEqual({ type: "text", text: "Hello" })
   })
 
-  test("filters out empty reasoning parts from array content", () => {
+  test("filters out empty reasoning parts from array content", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1214,14 +1214,14 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(1)
     expect(result[0].content[0]).toEqual({ type: "text", text: "Answer" })
   })
 
-  test("removes entire message when all parts are empty", () => {
+  test("removes entire message when all parts are empty", async () => {
     const msgs = [
       { role: "user", content: "Hello" },
       {
@@ -1234,14 +1234,14 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       { role: "user", content: "World" },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(2)
     expect(result[0].content).toBe("Hello")
     expect(result[1].content).toBe("World")
   })
 
-  test("keeps non-text/reasoning parts even if text parts are empty", () => {
+  test("keeps non-text/reasoning parts even if text parts are empty", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1252,7 +1252,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(1)
@@ -1264,7 +1264,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     })
   })
 
-  test("keeps messages with valid text alongside empty parts", () => {
+  test("keeps messages with valid text alongside empty parts", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1276,7 +1276,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {})
+    const result = await ProviderTransform.message(msgs, anthropicModel, {})
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toHaveLength(2)
@@ -1284,7 +1284,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     expect(result[0].content[1]).toEqual({ type: "text", text: "Result" })
   })
 
-  test("filters empty content for bedrock provider", () => {
+  test("filters empty content for bedrock provider", async () => {
     const bedrockModel = {
       ...anthropicModel,
       id: "amazon-bedrock/anthropic.claude-opus-4-6",
@@ -1308,7 +1308,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, bedrockModel, {})
+    const result = await ProviderTransform.message(msgs, bedrockModel, {})
 
     expect(result).toHaveLength(2)
     expect(result[0].content).toBe("Hello")
@@ -1316,7 +1316,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     expect(result[1].content[0]).toEqual({ type: "text", text: "Answer" })
   })
 
-  test("does not filter for non-anthropic providers", () => {
+  test("does not filter for non-anthropic providers", async () => {
     const openaiModel = {
       ...anthropicModel,
       providerID: "openai",
@@ -1335,14 +1335,14 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, openaiModel, {})
+    const result = await ProviderTransform.message(msgs, openaiModel, {})
 
     expect(result).toHaveLength(2)
     expect(result[0].content).toBe("")
     expect(result[1].content).toHaveLength(1)
   })
 
-  test("splits anthropic assistant messages when text trails tool calls", () => {
+  test("splits anthropic assistant messages when text trails tool calls", async () => {
     const msgs = [
       {
         role: "user",
@@ -1370,7 +1370,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {}) as any[]
+    const result = await ProviderTransform.message(msgs, anthropicModel, {}) as any[]
 
     expect(result).toHaveLength(4)
     expect(result[1]).toMatchObject({
@@ -1386,7 +1386,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     })
   })
 
-  test("leaves valid anthropic assistant tool ordering unchanged", () => {
+  test("leaves valid anthropic assistant tool ordering unchanged", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1398,7 +1398,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {}) as any[]
+    const result = await ProviderTransform.message(msgs, anthropicModel, {}) as any[]
 
     expect(result).toHaveLength(1)
     expect(result[0].content).toMatchObject([
@@ -1408,7 +1408,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     ])
   })
 
-  test("splits vertex anthropic assistant messages when text trails tool calls", () => {
+  test("splits vertex anthropic assistant messages when text trails tool calls", async () => {
     const model = {
       ...anthropicModel,
       providerID: "google-vertex-anthropic",
@@ -1430,7 +1430,7 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result).toHaveLength(2)
     expect(result[0]).toMatchObject({
@@ -1473,7 +1473,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
     headers: {},
   } as any
 
-  test("preserves itemId and reasoningEncryptedContent when store=false", () => {
+  test("preserves itemId and reasoningEncryptedContent when store=false", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1501,14 +1501,14 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, openaiModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, openaiModel, { store: false }) as any[]
 
     expect(result).toHaveLength(1)
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("rs_123")
     expect(result[0].content[1].providerOptions?.openai?.itemId).toBe("msg_456")
   })
 
-  test("preserves itemId and reasoningEncryptedContent when store=false even when not openai", () => {
+  test("preserves itemId and reasoningEncryptedContent when store=false even when not openai", async () => {
     const zenModel = {
       ...openaiModel,
       providerID: "zen",
@@ -1540,14 +1540,14 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, zenModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, zenModel, { store: false }) as any[]
 
     expect(result).toHaveLength(1)
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("rs_123")
     expect(result[0].content[1].providerOptions?.openai?.itemId).toBe("msg_456")
   })
 
-  test("preserves other openai options including itemId", () => {
+  test("preserves other openai options including itemId", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1566,13 +1566,13 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, openaiModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, openaiModel, { store: false }) as any[]
 
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("msg_123")
     expect(result[0].content[0].providerOptions?.openai?.otherOption).toBe("value")
   })
 
-  test("preserves metadata for openai package when store is true", () => {
+  test("preserves metadata for openai package when store is true", async () => {
     const msgs = [
       {
         role: "assistant",
@@ -1591,12 +1591,12 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
     ] as any[]
 
     // openai package preserves itemId regardless of store value
-    const result = ProviderTransform.message(msgs, openaiModel, { store: true }) as any[]
+    const result = await ProviderTransform.message(msgs, openaiModel, { store: true }) as any[]
 
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("msg_123")
   })
 
-  test("preserves metadata for non-openai packages when store is false", () => {
+  test("preserves metadata for non-openai packages when store is false", async () => {
     const anthropicModel = {
       ...openaiModel,
       providerID: "anthropic",
@@ -1624,12 +1624,12 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
     ] as any[]
 
     // store=false preserves metadata for non-openai packages
-    const result = ProviderTransform.message(msgs, anthropicModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, anthropicModel, { store: false }) as any[]
 
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("msg_123")
   })
 
-  test("preserves metadata using providerID key when store is false", () => {
+  test("preserves metadata using providerID key when store is false", async () => {
     const opencodeModel = {
       ...openaiModel,
       providerID: "opencode",
@@ -1657,13 +1657,13 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
 
     expect(result[0].content[0].providerOptions?.opencode?.itemId).toBe("msg_123")
     expect(result[0].content[0].providerOptions?.opencode?.otherOption).toBe("value")
   })
 
-  test("preserves itemId across all providerOptions keys", () => {
+  test("preserves itemId across all providerOptions keys", async () => {
     const opencodeModel = {
       ...openaiModel,
       providerID: "opencode",
@@ -1695,7 +1695,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
+    const result = await ProviderTransform.message(msgs, opencodeModel, { store: false }) as any[]
 
     expect(result[0].providerOptions?.openai?.itemId).toBe("msg_root")
     expect(result[0].providerOptions?.opencode?.itemId).toBe("msg_opencode")
@@ -1705,7 +1705,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
     expect(result[0].content[0].providerOptions?.extra?.itemId).toBe("msg_extra_part")
   })
 
-  test("does not strip metadata for non-openai packages when store is not false", () => {
+  test("does not strip metadata for non-openai packages when store is not false", async () => {
     const anthropicModel = {
       ...openaiModel,
       providerID: "anthropic",
@@ -1732,7 +1732,7 @@ describe("ProviderTransform.message - strip openai metadata when store=false", (
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, anthropicModel, {}) as any[]
+    const result = await ProviderTransform.message(msgs, anthropicModel, {}) as any[]
 
     expect(result[0].content[0].providerOptions?.openai?.itemId).toBe("msg_123")
   })
@@ -1765,7 +1765,7 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
       headers: {},
     }) as any
 
-  test("azure keeps 'azure' key and does not remap to 'openai'", () => {
+  test("azure keeps 'azure' key and does not remap to 'openai'", async () => {
     const model = createModel("azure", "@ai-sdk/azure")
     const msgs = [
       {
@@ -1777,13 +1777,13 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {})
+    const result = await ProviderTransform.message(msgs, model, {})
 
     expect(result[0].providerOptions?.azure).toEqual({ someOption: "value" })
     expect(result[0].providerOptions?.openai).toBeUndefined()
   })
 
-  test("azure cognitive services remaps providerID to 'azure' key", () => {
+  test("azure cognitive services remaps providerID to 'azure' key", async () => {
     const model = createModel("azure-cognitive-services", "@ai-sdk/azure")
     const msgs = [
       {
@@ -1803,7 +1803,7 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
     const part = result[0].content[0] as any
 
     expect(result[0].providerOptions?.azure).toEqual({ someOption: "value" })
@@ -1812,7 +1812,7 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
     expect(part.providerOptions?.["azure-cognitive-services"]).toBeUndefined()
   })
 
-  test("copilot remaps providerID to 'copilot' key", () => {
+  test("copilot remaps providerID to 'copilot' key", async () => {
     const model = createModel("github-copilot", "@ai-sdk/github-copilot")
     const msgs = [
       {
@@ -1824,13 +1824,13 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {})
+    const result = await ProviderTransform.message(msgs, model, {})
 
     expect(result[0].providerOptions?.copilot).toEqual({ someOption: "value" })
     expect(result[0].providerOptions?.["github-copilot"]).toBeUndefined()
   })
 
-  test("bedrock remaps providerID to 'bedrock' key", () => {
+  test("bedrock remaps providerID to 'bedrock' key", async () => {
     const model = createModel("my-bedrock", "@ai-sdk/amazon-bedrock")
     const msgs = [
       {
@@ -1842,7 +1842,7 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {})
+    const result = await ProviderTransform.message(msgs, model, {})
 
     expect(result[0].providerOptions?.bedrock).toEqual({ someOption: "value" })
     expect(result[0].providerOptions?.["my-bedrock"]).toBeUndefined()
@@ -1850,7 +1850,7 @@ describe("ProviderTransform.message - providerOptions key remapping", () => {
 })
 
 describe("ProviderTransform.message - claude w/bedrock custom inference profile", () => {
-  test("adds cachePoint", () => {
+  test("adds cachePoint", async () => {
     const model = {
       id: "amazon-bedrock/custom-claude-sonnet-4.5",
       providerID: "amazon-bedrock",
@@ -1872,7 +1872,7 @@ describe("ProviderTransform.message - claude w/bedrock custom inference profile"
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {})
+    const result = await ProviderTransform.message(msgs, model, {})
 
     expect(result[0].providerOptions?.bedrock).toEqual(
       expect.objectContaining({
@@ -1885,7 +1885,7 @@ describe("ProviderTransform.message - claude w/bedrock custom inference profile"
 })
 
 describe("ProviderTransform.message - bedrock caching with non-bedrock providerID", () => {
-  test("applies cache options at message level when npm package is amazon-bedrock", () => {
+  test("applies cache options at message level when npm package is amazon-bedrock", async () => {
     const model = {
       id: "aws/us.anthropic.claude-opus-4-6-v1",
       providerID: "aws",
@@ -1911,7 +1911,7 @@ describe("ProviderTransform.message - bedrock caching with non-bedrock providerI
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     // Cache should be at the message level and not the content-part level
     expect(result[0].providerOptions?.bedrock).toEqual({
@@ -1949,7 +1949,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       ...overrides,
     }) as any
 
-  test("gateway does not set cache control for anthropic models", () => {
+  test("gateway does not set cache control for anthropic models", async () => {
     const model = createModel()
     const msgs = [
       {
@@ -1962,13 +1962,13 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].content[0].providerOptions).toBeUndefined()
     expect(result[0].providerOptions).toBeUndefined()
   })
 
-  test("non-gateway anthropic keeps existing cache control behavior", () => {
+  test("non-gateway anthropic keeps existing cache control behavior", async () => {
     const model = createModel({
       providerID: "anthropic",
       api: {
@@ -1988,7 +1988,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].providerOptions).toEqual({
       anthropic: {
@@ -2024,7 +2024,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
     })
   })
 
-  test("non-gateway anthropic with cachePromptTTL '1h' sets ttl on anthropic and openrouter only", () => {
+  test("non-gateway anthropic with cachePromptTTL '1h' sets ttl on anthropic and openrouter only", async () => {
     const model = createModel({
       providerID: "anthropic",
       api: {
@@ -2045,7 +2045,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].providerOptions).toEqual({
       anthropic: {
@@ -2069,7 +2069,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
     })
   })
 
-  test("non-gateway anthropic with cachePromptTTL '5m' does not set ttl (default behavior)", () => {
+  test("non-gateway anthropic with cachePromptTTL '5m' does not set ttl (default behavior)", async () => {
     const model = createModel({
       providerID: "anthropic",
       api: {
@@ -2084,13 +2084,13 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       { role: "user", content: "Hello" },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].providerOptions?.anthropic).toEqual({ cacheControl: { type: "ephemeral" } })
     expect(result[0].providerOptions?.openrouter).toEqual({ cacheControl: { type: "ephemeral" } })
   })
 
-  test("google-vertex-anthropic applies cache control", () => {
+  test("google-vertex-anthropic applies cache control", async () => {
     const model = createModel({
       providerID: "google-vertex-anthropic",
       api: {
@@ -2111,7 +2111,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].providerOptions).toEqual({
       anthropic: {
@@ -2147,7 +2147,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
     })
   })
 
-  test("openai-compatible with claude in model id does NOT trigger caching", () => {
+  test("openai-compatible with claude in model id does NOT trigger caching", async () => {
     const model = createModel({
       id: "mimorouter/claude-opus-4-8",
       providerID: "custom",
@@ -2168,7 +2168,7 @@ describe("ProviderTransform.message - cache control on gateway", () => {
       },
     ] as any[]
 
-    const result = ProviderTransform.message(msgs, model, {}) as any[]
+    const result = await ProviderTransform.message(msgs, model, {}) as any[]
 
     expect(result[0].providerOptions).toBeUndefined()
   })
@@ -2209,7 +2209,7 @@ describe("ProviderTransform.variants", () => {
     ...overrides,
   })
 
-  test("returns empty object when model has no reasoning capabilities", () => {
+  test("returns empty object when model has no reasoning capabilities", async () => {
     const model = createMockModel({
       capabilities: { reasoning: false },
     })
@@ -2217,7 +2217,7 @@ describe("ProviderTransform.variants", () => {
     expect(result).toEqual({})
   })
 
-  test("deepseek returns empty object", () => {
+  test("deepseek returns empty object", async () => {
     const model = createMockModel({
       id: "deepseek/deepseek-chat",
       providerID: "deepseek",
@@ -2231,7 +2231,7 @@ describe("ProviderTransform.variants", () => {
     expect(result).toEqual({})
   })
 
-  test("minimax returns empty object", () => {
+  test("minimax returns empty object", async () => {
     const model = createMockModel({
       id: "minimax/minimax-model",
       providerID: "minimax",
@@ -2245,7 +2245,7 @@ describe("ProviderTransform.variants", () => {
     expect(result).toEqual({})
   })
 
-  test("glm returns empty object", () => {
+  test("glm returns empty object", async () => {
     const model = createMockModel({
       id: "glm/glm-4",
       providerID: "glm",
@@ -2259,7 +2259,7 @@ describe("ProviderTransform.variants", () => {
     expect(result).toEqual({})
   })
 
-  test("mistral returns empty object", () => {
+  test("mistral returns empty object", async () => {
     const model = createMockModel({
       id: "mistral/mistral-large",
       providerID: "mistral",
@@ -2274,7 +2274,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@openrouter/ai-sdk-provider", () => {
-    test("returns empty object for non-qualifying models", () => {
+    test("returns empty object for non-qualifying models", async () => {
       const model = createMockModel({
         id: "openrouter/test-model",
         providerID: "openrouter",
@@ -2288,7 +2288,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("gpt models return OPENAI_EFFORTS with reasoning", () => {
+    test("gpt models return OPENAI_EFFORTS with reasoning", async () => {
       const model = createMockModel({
         id: "openrouter/gpt-4",
         providerID: "openrouter",
@@ -2304,7 +2304,7 @@ describe("ProviderTransform.variants", () => {
       expect(result.high).toEqual({ reasoning: { effort: "high" } })
     })
 
-    test("gemini-3 returns OPENAI_EFFORTS with reasoning", () => {
+    test("gemini-3 returns OPENAI_EFFORTS with reasoning", async () => {
       const model = createMockModel({
         id: "openrouter/gemini-3-5-pro",
         providerID: "openrouter",
@@ -2318,7 +2318,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["none", "minimal", "low", "medium", "high", "xhigh"])
     })
 
-    test("grok-4 returns empty object", () => {
+    test("grok-4 returns empty object", async () => {
       const model = createMockModel({
         id: "openrouter/grok-4",
         providerID: "openrouter",
@@ -2332,7 +2332,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("grok-3-mini returns low and high with reasoning", () => {
+    test("grok-3-mini returns low and high with reasoning", async () => {
       const model = createMockModel({
         id: "openrouter/grok-3-mini",
         providerID: "openrouter",
@@ -2350,7 +2350,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/gateway", () => {
-    test("anthropic sonnet 4.6 models return adaptive thinking options", () => {
+    test("anthropic sonnet 4.6 models return adaptive thinking options", async () => {
       const model = createMockModel({
         id: "anthropic/claude-sonnet-4-6",
         providerID: "gateway",
@@ -2370,7 +2370,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic sonnet 4.6 dot-format models return adaptive thinking options", () => {
+    test("anthropic sonnet 4.6 dot-format models return adaptive thinking options", async () => {
       const model = createMockModel({
         id: "anthropic/claude-sonnet-4-6",
         providerID: "gateway",
@@ -2390,7 +2390,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic opus 4.6 dot-format models return adaptive thinking options", () => {
+    test("anthropic opus 4.6 dot-format models return adaptive thinking options", async () => {
       const model = createMockModel({
         id: "anthropic/claude-opus-4-6",
         providerID: "gateway",
@@ -2410,7 +2410,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic opus 4.7 models return adaptive thinking options with xhigh", () => {
+    test("anthropic opus 4.7 models return adaptive thinking options with xhigh", async () => {
       const model = createMockModel({
         id: "anthropic/claude-opus-4-7",
         providerID: "gateway",
@@ -2436,7 +2436,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic opus 4.7 dot-format models return adaptive thinking options with xhigh", () => {
+    test("anthropic opus 4.7 dot-format models return adaptive thinking options with xhigh", async () => {
       const model = createMockModel({
         id: "anthropic/claude-opus-4-7",
         providerID: "gateway",
@@ -2450,7 +2450,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high", "xhigh", "max"])
     })
 
-    test("anthropic models return anthropic thinking options", () => {
+    test("anthropic models return anthropic thinking options", async () => {
       const model = createMockModel({
         id: "anthropic/claude-sonnet-4",
         providerID: "gateway",
@@ -2476,7 +2476,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("returns OPENAI_EFFORTS with reasoningEffort", () => {
+    test("returns OPENAI_EFFORTS with reasoningEffort", async () => {
       const model = createMockModel({
         id: "gateway/gateway-model",
         providerID: "gateway",
@@ -2494,7 +2494,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/github-copilot", () => {
-    test("standard models return low, medium, high", () => {
+    test("standard models return low, medium, high", async () => {
       const model = createMockModel({
         id: "gpt-4.5",
         providerID: "github-copilot",
@@ -2513,7 +2513,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("gpt-5.1-codex-max includes xhigh", () => {
+    test("gpt-5.1-codex-max includes xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.1-codex-max",
         providerID: "github-copilot",
@@ -2527,7 +2527,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high", "xhigh"])
     })
 
-    test("gpt-5.1-codex-mini does not include xhigh", () => {
+    test("gpt-5.1-codex-mini does not include xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.1-codex-mini",
         providerID: "github-copilot",
@@ -2541,7 +2541,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high"])
     })
 
-    test("gpt-5.1-codex does not include xhigh", () => {
+    test("gpt-5.1-codex does not include xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.1-codex",
         providerID: "github-copilot",
@@ -2555,7 +2555,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high"])
     })
 
-    test("gpt-5.2 includes xhigh", () => {
+    test("gpt-5.2 includes xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.2",
         providerID: "github-copilot",
@@ -2574,7 +2574,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("gpt-5.2-codex includes xhigh", () => {
+    test("gpt-5.2-codex includes xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.2-codex",
         providerID: "github-copilot",
@@ -2588,7 +2588,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high", "xhigh"])
     })
 
-    test("gpt-5.3-codex includes xhigh", () => {
+    test("gpt-5.3-codex includes xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.3-codex",
         providerID: "github-copilot",
@@ -2602,7 +2602,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["low", "medium", "high", "xhigh"])
     })
 
-    test("gpt-5.4 includes xhigh", () => {
+    test("gpt-5.4 includes xhigh", async () => {
       const model = createMockModel({
         id: "gpt-5.4",
         release_date: "2026-03-05",
@@ -2619,7 +2619,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/cerebras", () => {
-    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
+    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", async () => {
       const model = createMockModel({
         id: "cerebras/llama-4",
         providerID: "cerebras",
@@ -2637,7 +2637,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/togetherai", () => {
-    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
+    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", async () => {
       const model = createMockModel({
         id: "togetherai/llama-4",
         providerID: "togetherai",
@@ -2655,7 +2655,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/xai", () => {
-    test("grok-3 returns empty object", () => {
+    test("grok-3 returns empty object", async () => {
       const model = createMockModel({
         id: "xai/grok-3",
         providerID: "xai",
@@ -2669,7 +2669,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("grok-3-mini returns low and high with reasoningEffort", () => {
+    test("grok-3-mini returns low and high with reasoningEffort", async () => {
       const model = createMockModel({
         id: "xai/grok-3-mini",
         providerID: "xai",
@@ -2687,7 +2687,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/deepinfra", () => {
-    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
+    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", async () => {
       const model = createMockModel({
         id: "deepinfra/llama-4",
         providerID: "deepinfra",
@@ -2705,7 +2705,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/openai-compatible", () => {
-    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
+    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", async () => {
       const model = createMockModel({
         id: "custom-provider/custom-model",
         providerID: "custom-provider",
@@ -2723,7 +2723,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/azure", () => {
-    test("o1-mini returns empty object", () => {
+    test("o1-mini returns empty object", async () => {
       const model = createMockModel({
         id: "o1-mini",
         providerID: "azure",
@@ -2737,7 +2737,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("standard azure models return custom efforts with reasoningSummary", () => {
+    test("standard azure models return custom efforts with reasoningSummary", async () => {
       const model = createMockModel({
         id: "o1",
         providerID: "azure",
@@ -2756,7 +2756,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("gpt-5 adds minimal effort", () => {
+    test("gpt-5 adds minimal effort", async () => {
       const model = createMockModel({
         id: "gpt-5",
         providerID: "azure",
@@ -2772,7 +2772,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/openai", () => {
-    test("gpt-5-pro returns empty object", () => {
+    test("gpt-5-pro returns empty object", async () => {
       const model = createMockModel({
         id: "gpt-5-pro",
         providerID: "openai",
@@ -2786,7 +2786,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("standard openai models return custom efforts with reasoningSummary", () => {
+    test("standard openai models return custom efforts with reasoningSummary", async () => {
       const model = createMockModel({
         id: "gpt-5",
         providerID: "openai",
@@ -2806,7 +2806,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("models after 2025-11-13 include 'none' effort", () => {
+    test("models after 2025-11-13 include 'none' effort", async () => {
       const model = createMockModel({
         id: "gpt-5-nano",
         providerID: "openai",
@@ -2821,7 +2821,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["none", "minimal", "low", "medium", "high"])
     })
 
-    test("models after 2025-12-04 include 'xhigh' effort", () => {
+    test("models after 2025-12-04 include 'xhigh' effort", async () => {
       const model = createMockModel({
         id: "openai/gpt-5-chat",
         providerID: "openai",
@@ -2838,7 +2838,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/anthropic", () => {
-    test("sonnet 4.6 returns adaptive thinking options", () => {
+    test("sonnet 4.6 returns adaptive thinking options", async () => {
       const model = createMockModel({
         id: "anthropic/claude-sonnet-4-6",
         providerID: "anthropic",
@@ -2858,7 +2858,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("opus 4.7 returns adaptive thinking options with xhigh", () => {
+    test("opus 4.7 returns adaptive thinking options with xhigh", async () => {
       const model = createMockModel({
         id: "anthropic/claude-opus-4-7",
         providerID: "anthropic",
@@ -2886,7 +2886,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("returns high and max with thinking config", () => {
+    test("returns high and max with thinking config", async () => {
       const model = createMockModel({
         id: "anthropic/claude-4",
         providerID: "anthropic",
@@ -2914,7 +2914,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/amazon-bedrock", () => {
-    test("anthropic sonnet 4.6 returns adaptive reasoning options", () => {
+    test("anthropic sonnet 4.6 returns adaptive reasoning options", async () => {
       const model = createMockModel({
         id: "bedrock/anthropic-claude-sonnet-4-6",
         providerID: "bedrock",
@@ -2934,7 +2934,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic opus 4.7 returns adaptive reasoning options with xhigh", () => {
+    test("anthropic opus 4.7 returns adaptive reasoning options with xhigh", async () => {
       const model = createMockModel({
         id: "bedrock/anthropic-claude-opus-4-7",
         providerID: "bedrock",
@@ -2962,7 +2962,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningConfig", () => {
+    test("returns WIDELY_SUPPORTED_EFFORTS with reasoningConfig", async () => {
       const model = createMockModel({
         id: "bedrock/llama-4",
         providerID: "bedrock",
@@ -2984,7 +2984,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/google", () => {
-    test("gemini-2.5 returns high and max with thinkingConfig and thinkingBudget", () => {
+    test("gemini-2.5 returns high and max with thinkingConfig and thinkingBudget", async () => {
       const model = createMockModel({
         id: "google/gemini-2.5-pro",
         providerID: "google",
@@ -3010,7 +3010,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("other gemini models return low and high with thinkingLevel", () => {
+    test("other gemini models return low and high with thinkingLevel", async () => {
       const model = createMockModel({
         id: "google/gemini-2.0-pro",
         providerID: "google",
@@ -3038,7 +3038,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/google-vertex", () => {
-    test("gemini-2.5 returns high and max with thinkingConfig and thinkingBudget", () => {
+    test("gemini-2.5 returns high and max with thinkingConfig and thinkingBudget", async () => {
       const model = createMockModel({
         id: "google-vertex/gemini-2.5-pro",
         providerID: "google-vertex",
@@ -3052,7 +3052,7 @@ describe("ProviderTransform.variants", () => {
       expect(Object.keys(result)).toEqual(["high", "max"])
     })
 
-    test("other vertex models return low and high with thinkingLevel", () => {
+    test("other vertex models return low and high with thinkingLevel", async () => {
       const model = createMockModel({
         id: "google-vertex/gemini-2.0-pro",
         providerID: "google-vertex",
@@ -3068,7 +3068,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/cohere", () => {
-    test("returns empty object", () => {
+    test("returns empty object", async () => {
       const model = createMockModel({
         id: "cohere/command-r",
         providerID: "cohere",
@@ -3084,7 +3084,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/groq", () => {
-    test("returns none and WIDELY_SUPPORTED_EFFORTS with thinkingLevel", () => {
+    test("returns none and WIDELY_SUPPORTED_EFFORTS with thinkingLevel", async () => {
       const model = createMockModel({
         id: "groq/llama-4",
         providerID: "groq",
@@ -3106,7 +3106,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@ai-sdk/perplexity", () => {
-    test("returns empty object", () => {
+    test("returns empty object", async () => {
       const model = createMockModel({
         id: "perplexity/sonar-plus",
         providerID: "perplexity",
@@ -3122,7 +3122,7 @@ describe("ProviderTransform.variants", () => {
   })
 
   describe("@jerome-benoit/sap-ai-provider-v2", () => {
-    test("anthropic models return thinking variants", () => {
+    test("anthropic models return thinking variants", async () => {
       const model = createMockModel({
         id: "sap-ai-core/anthropic--claude-sonnet-4",
         providerID: "sap-ai-core",
@@ -3148,7 +3148,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("anthropic 4.6 models return adaptive thinking variants", () => {
+    test("anthropic 4.6 models return adaptive thinking variants", async () => {
       const model = createMockModel({
         id: "sap-ai-core/anthropic--claude-sonnet-4-6",
         providerID: "sap-ai-core",
@@ -3174,7 +3174,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("gemini 2.5 models return thinkingConfig variants", () => {
+    test("gemini 2.5 models return thinkingConfig variants", async () => {
       const model = createMockModel({
         id: "sap-ai-core/gcp--gemini-2.5-pro",
         providerID: "sap-ai-core",
@@ -3200,7 +3200,7 @@ describe("ProviderTransform.variants", () => {
       })
     })
 
-    test("gpt models return reasoningEffort variants", () => {
+    test("gpt models return reasoningEffort variants", async () => {
       const model = createMockModel({
         id: "sap-ai-core/azure-openai--gpt-4o",
         providerID: "sap-ai-core",
@@ -3216,7 +3216,7 @@ describe("ProviderTransform.variants", () => {
       expect(result.high).toEqual({ reasoningEffort: "high" })
     })
 
-    test("o-series models return reasoningEffort variants", () => {
+    test("o-series models return reasoningEffort variants", async () => {
       const model = createMockModel({
         id: "sap-ai-core/azure-openai--o3-mini",
         providerID: "sap-ai-core",
@@ -3232,7 +3232,7 @@ describe("ProviderTransform.variants", () => {
       expect(result.high).toEqual({ reasoningEffort: "high" })
     })
 
-    test("sonar models return empty object", () => {
+    test("sonar models return empty object", async () => {
       const model = createMockModel({
         id: "sap-ai-core/perplexity--sonar-pro",
         providerID: "sap-ai-core",
@@ -3246,7 +3246,7 @@ describe("ProviderTransform.variants", () => {
       expect(result).toEqual({})
     })
 
-    test("mistral models return empty object", () => {
+    test("mistral models return empty object", async () => {
       const model = createMockModel({
         id: "sap-ai-core/mistral--mistral-large",
         providerID: "sap-ai-core",
@@ -3300,7 +3300,7 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     ],
   } as any
 
-  test("openai providerID — flattens to single object, no oneOf/anyOf at root", () => {
+  test("openai providerID — flattens to single object, no oneOf/anyOf at root", async () => {
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     expect(result.type).toBe("object")
     expect(result.anyOf).toBeUndefined()
@@ -3309,7 +3309,7 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.additionalProperties).toBe(false)
   })
 
-  test("openai — merges variant properties at root", () => {
+  test("openai — merges variant properties at root", async () => {
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     // All non-discriminator properties merged in (the flatten adds an
     // "(only when action=...)" prefix to descriptions; assert structurally).
@@ -3321,7 +3321,7 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.properties.id.minLength).toBe(1)
   })
 
-  test("openai — annotates each property with which actions own it", () => {
+  test("openai — annotates each property with which actions own it", async () => {
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     // parent_id only appears in the "create" variant
     expect(result.properties.parent_id.description).toContain('only when action="create"')
@@ -3331,7 +3331,7 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.properties.summary.description).toContain('only when action="create"|"rename"')
   })
 
-  test("openai — discriminator becomes enum with per-variant required hints", () => {
+  test("openai — discriminator becomes enum with per-variant required hints", async () => {
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     expect(result.properties.action.type).toBe("string")
     expect(result.properties.action.enum).toEqual(["create", "list", "rename"])
@@ -3340,12 +3340,12 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.properties.action.description).toContain("rename: requires id, summary")
   })
 
-  test("openai — only discriminator is required at root", () => {
+  test("openai — only discriminator is required at root", async () => {
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     expect(result.required).toEqual(["action"])
   })
 
-  test("@ai-sdk/openai-compatible npm — also flattens", () => {
+  test("@ai-sdk/openai-compatible npm — also flattens", async () => {
     const result = ProviderTransform.schema(
       { providerID: "custom-router", api: { id: "x", npm: "@ai-sdk/openai-compatible" } } as any,
       anyOfSchema,
@@ -3354,13 +3354,13 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.anyOf).toBeUndefined()
   })
 
-  test("azure providerID — also flattens", () => {
+  test("azure providerID — also flattens", async () => {
     const result = ProviderTransform.schema({ providerID: "azure", api: { id: "gpt-4" } } as any, anyOfSchema) as any
     expect(result.type).toBe("object")
     expect(result.anyOf).toBeUndefined()
   })
 
-  test("anthropic — also flattens anyOf-rooted schema (bedrock proxy compatibility)", () => {
+  test("anthropic — also flattens anyOf-rooted schema (bedrock proxy compatibility)", async () => {
     const result = ProviderTransform.schema(
       { providerID: "anthropic", api: { id: "claude", npm: "@ai-sdk/anthropic" } } as any,
       anyOfSchema,
@@ -3369,7 +3369,7 @@ describe("ProviderTransform.schema - openai discriminated-union flatten", () => 
     expect(result.anyOf).toBeUndefined()
   })
 
-  test("openai — passes through schemas that are already type: object", () => {
+  test("openai — passes through schemas that are already type: object", async () => {
     const flat = { type: "object", properties: { a: { type: "string" } }, required: ["a"] } as any
     const result = ProviderTransform.schema({ providerID: "openai", api: { id: "gpt-4" } } as any, flat) as any
     expect(result.type).toBe("object")
