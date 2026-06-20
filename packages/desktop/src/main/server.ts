@@ -176,7 +176,6 @@ export class ServerManager {
    */
   private resolveCliLaunchConfig(): CliLaunchConfig {
     const isWindows = process.platform === "win32"
-    const binName = isWindows ? "mimo.cmd" : "mimo"
     const serveArgs = ["serve", "--port", "0", "--hostname", "127.0.0.1"]
 
     // 1. Environment variable override (dev mode)
@@ -184,8 +183,6 @@ export class ServerManager {
     if (envPath) {
       const resolved = envPath.startsWith(".") ? join(__dirname, "..", "..", envPath) : envPath
       if (resolved.endsWith(".ts")) {
-        // Use bun to run the CLI source directly
-        // --conditions=browser is needed for proper module resolution
         return { command: "bun", args: ["run", "--conditions=browser", resolved, ...serveArgs] }
       }
       return { command: resolved, args: serveArgs }
@@ -193,10 +190,15 @@ export class ServerManager {
 
     // 2. Bundled binary (production)
     if (app.isPackaged) {
-      const bundled = join(process.resourcesPath, "bin", binName)
-      if (existsSync(bundled)) {
-        return { command: bundled, args: serveArgs }
+      // Try mimo.exe first, then mimo.cmd, then mimo
+      for (const name of isWindows ? ["mimo.exe", "mimo.cmd", "mimo"] : ["mimo"]) {
+        const bundled = join(process.resourcesPath, "bin", name)
+        if (existsSync(bundled)) {
+          return { command: bundled, args: serveArgs }
+        }
       }
+      // Log error for debugging
+      log.error("CLI binary not found in resources:", process.resourcesPath)
     }
 
     // 3. Sibling package binary (development, after build)

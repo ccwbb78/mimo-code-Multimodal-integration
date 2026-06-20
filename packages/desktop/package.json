@@ -2,6 +2,8 @@
   "name": "@mimo-ai/desktop",
   "version": "0.2.0",
   "description": "MiMoCode Desktop - AI-powered development tool",
+  "author": "MiMoCode <mimo@xiaomi.com>",
+  "license": "MIT",
   "private": true,
   "main": "./dist/main/index.js",
   "scripts": {
@@ -9,10 +11,10 @@
     "dev:renderer": "vite --config vite.renderer.config.ts",
     "build": "electron-vite build",
     "build:renderer": "vite build --config vite.renderer.config.ts",
-    "package": "electron-builder --config electron-builder.config.ts",
-    "package:win": "electron-builder --win --config electron-builder.config.ts",
-    "package:mac": "electron-builder --mac --config electron-builder.config.ts",
-    "package:linux": "electron-builder --linux --config electron-builder.config.ts",
+    "package": "electron-builder --config electron-builder.json",
+    "package:win": "electron-builder --win --config electron-builder.json",
+    "package:mac": "electron-builder --mac --config electron-builder.json",
+    "package:linux": "electron-builder --linux --config electron-builder.json",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -22,7 +24,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
-    "electron": "^34.0.0",
+    "electron": "34.5.8",
     "electron-builder": "^25.1.8",
     "electron-vite": "^5.0.0",
     "solid-js": "catalog:",

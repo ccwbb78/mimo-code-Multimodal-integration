@@ -213,7 +213,7 @@
       },
       "devDependencies": {
         "@tailwindcss/vite": "catalog:",
-        "electron": "^34.0.0",
+        "electron": "34.5.8",
         "electron-builder": "^25.1.8",
         "electron-vite": "^5.0.0",
         "solid-js": "catalog:",
