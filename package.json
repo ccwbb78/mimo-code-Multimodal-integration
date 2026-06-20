@@ -13,7 +13,7 @@
     "dev:storybook": "bun --cwd packages/storybook storybook",
     "lint": "oxlint",
     "typecheck": "bun turbo typecheck",
-    "postinstall": "bun run --cwd packages/opencode fix-node-pty",
+    "postinstall": "bun run --cwd packages/opencode fix-node-pty && cd node_modules/@babel/helper-compilation-targets && npm install lru-cache@5.1.1 --no-save --legacy-peer-deps 2>/dev/null || true",
     "prepare": "husky",
     "random": "echo 'Random script'",
     "hello": "echo 'Hello World!'",
@@ -83,20 +83,33 @@
   },
   "devDependencies": {
     "@actions/artifact": "5.0.1",
+    "@tailwindcss/vite": "catalog:",
     "@tsconfig/bun": "catalog:",
     "@types/mime-types": "3.0.1",
+    "@types/node": "catalog:",
     "@typescript/native-preview": "catalog:",
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.8",
+    "electron-log": "^5.2.0",
+    "electron-store": "^10.0.0",
+    "electron-updater": "^6.3.9",
+    "electron-vite": "^5.0.0",
     "glob": "13.0.5",
     "husky": "9.1.7",
     "oxlint": "1.60.0",
     "oxlint-tsgolint": "0.21.0",
     "prettier": "3.6.2",
     "semver": "^7.6.0",
+    "solid-js": "catalog:",
     "sst": "3.18.10",
-    "turbo": "2.8.13"
+    "turbo": "2.8.13",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-solid": "catalog:"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.933.0",
+    "@mimo-ai/desktop": "workspace:*",
     "@mimo-ai/plugin": "workspace:*",
     "@mimo-ai/script": "workspace:*",
     "@mimo-ai/sdk": "workspace:*",
@@ -124,7 +137,8 @@
   ],
   "overrides": {
     "@types/bun": "catalog:",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "effect": "catalog:"
   },
   "patchedDependencies": {
     "@npmcli/agent@4.0.0": "patches/@npmcli%2Fagent@4.0.0.patch",

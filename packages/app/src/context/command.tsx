@@ -4,6 +4,7 @@ import { type Accessor, createEffect, createMemo, onCleanup, onMount } from "sol
 import { createStore } from "solid-js/store"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { useLanguage } from "@/context/language"
+import { usePlatform } from "@/context/platform"
 import { useSettings } from "@/context/settings"
 import { dict as en } from "@/i18n/en"
 import { Persist, persisted } from "@/utils/persist"
@@ -231,9 +232,10 @@ export const { use: useCommand, provider: CommandProvider } = createSimpleContex
   name: "Command",
   init: () => {
     const dialog = useDialog()
-    const settings = useSettings()
-    const language = useLanguage()
-    const [store, setStore] = createStore({
+  const settings = useSettings()
+  const language = useLanguage()
+  const platform = usePlatform()
+  const [store, setStore] = createStore({
       registrations: [] as CommandRegistration[],
       suspendCount: 0,
     })
@@ -380,6 +382,8 @@ export const { use: useCommand, provider: CommandProvider } = createSimpleContex
 
     onMount(() => {
       makeEventListener(document, "keydown", handleKeyDown)
+      const unsubscribe = platform.onMenuAction?.((action) => run(action, "palette"))
+      if (unsubscribe) onCleanup(unsubscribe)
     })
 
     function register(cb: () => CommandOption[]): void

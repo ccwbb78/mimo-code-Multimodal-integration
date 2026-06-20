@@ -1,58 +1,32 @@
-import { Menu, shell } from "electron"
+import { app, Menu, type MenuItemConstructorOptions } from "electron"
 
-import { UPDATER_ENABLED } from "./constants"
-import { createMainWindow } from "./windows"
+/**
+ * Set up the native application menu.
+ */
+export function setupMenu(): void {
+  const isMac = process.platform === "darwin"
 
-type Deps = {
-  trigger: (id: string) => void
-  checkForUpdates: () => void
-  reload: () => void
-  relaunch: () => void
-}
-
-export function createMenu(deps: Deps) {
-  if (process.platform !== "darwin") return
-
-  const template: Electron.MenuItemConstructorOptions[] = [
-    {
-      label: "OpenCode",
-      submenu: [
-        { role: "about" },
-        {
-          label: "Check for Updates...",
-          enabled: UPDATER_ENABLED,
-          click: () => deps.checkForUpdates(),
-        },
-        {
-          label: "Reload Webview",
-          click: () => deps.reload(),
-        },
-        {
-          label: "Restart",
-          click: () => deps.relaunch(),
-        },
-        { type: "separator" },
-        { role: "hide" },
-        { role: "hideOthers" },
-        { role: "unhide" },
-        { type: "separator" },
-        { role: "quit" },
-      ],
-    },
-    {
-      label: "File",
-      submenu: [
-        { label: "New Session", accelerator: "Shift+Cmd+S", click: () => deps.trigger("session.new") },
-        { label: "Open Project...", accelerator: "Cmd+O", click: () => deps.trigger("project.open") },
-        {
-          label: "New Window",
-          accelerator: "Cmd+Shift+N",
-          click: () => createMainWindow(),
-        },
-        { type: "separator" },
-        { role: "close" },
-      ],
-    },
+  const template: MenuItemConstructorOptions[] = [
+    // macOS app menu
+    ...(isMac
+      ? [
+          {
+            label: app.name,
+            submenu: [
+              { role: "about" as const },
+              { type: "separator" as const },
+              { role: "services" as const },
+              { type: "separator" as const },
+              { role: "hide" as const },
+              { role: "hideOthers" as const },
+              { role: "unhide" as const },
+              { type: "separator" as const },
+              { role: "quit" as const },
+            ],
+          },
+        ]
+      : []),
+    // Edit
     {
       label: "Edit",
       submenu: [
@@ -65,14 +39,12 @@ export function createMenu(deps: Deps) {
         { role: "selectAll" },
       ],
     },
+    // View
     {
       label: "View",
       submenu: [
-        { label: "Toggle Sidebar", accelerator: "Cmd+B", click: () => deps.trigger("sidebar.toggle") },
-        { label: "Toggle Terminal", accelerator: "Ctrl+`", click: () => deps.trigger("terminal.toggle") },
-        { label: "Toggle File Tree", click: () => deps.trigger("fileTree.toggle") },
-        { type: "separator" },
         { role: "reload" },
+        { role: "forceReload" },
         { role: "toggleDevTools" },
         { type: "separator" },
         { role: "resetZoom" },
@@ -82,55 +54,22 @@ export function createMenu(deps: Deps) {
         { role: "togglefullscreen" },
       ],
     },
+    // Window
     {
-      label: "Go",
+      label: "Window",
       submenu: [
-        { label: "Back", accelerator: "Cmd+[", click: () => deps.trigger("common.goBack") },
-        { label: "Forward", accelerator: "Cmd+]", click: () => deps.trigger("common.goForward") },
-        { type: "separator" },
-        {
-          label: "Previous Session",
-          accelerator: "Option+Up",
-          click: () => deps.trigger("session.previous"),
-        },
-        {
-          label: "Next Session",
-          accelerator: "Option+Down",
-          click: () => deps.trigger("session.next"),
-        },
-        { type: "separator" },
-        {
-          label: "Previous Project",
-          accelerator: "Cmd+Option+Up",
-          click: () => deps.trigger("project.previous"),
-        },
-        {
-          label: "Next Project",
-          accelerator: "Cmd+Option+Down",
-          click: () => deps.trigger("project.next"),
-        },
-      ],
-    },
-    { role: "windowMenu" },
-    {
-      label: "Help",
-      submenu: [
-        { label: "OpenCode Documentation", click: () => shell.openExternal("https://opencode.ai/docs") },
-        { label: "Support Forum", click: () => shell.openExternal("https://discord.com/invite/opencode") },
-        { type: "separator" },
-        { type: "separator" },
-        {
-          label: "Share Feedback",
-          click: () =>
-            shell.openExternal("https://github.com/anomalyco/opencode/issues/new?template=feature_request.yml"),
-        },
-        {
-          label: "Report a Bug",
-          click: () => shell.openExternal("https://github.com/anomalyco/opencode/issues/new?template=bug_report.yml"),
-        },
+        { role: "minimize" },
+        { role: "zoom" },
+        ...(isMac
+          ? [
+              { type: "separator" as const },
+              { role: "front" as const },
+            ]
+          : [{ role: "close" as const }]),
       ],
     },
   ]
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 }

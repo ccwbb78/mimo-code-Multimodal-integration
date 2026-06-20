@@ -1,79 +1,81 @@
+import { resolve } from "path"
 import { defineConfig } from "electron-vite"
-import appPlugin from "@mimo-ai/app/vite"
-import * as fs from "node:fs/promises"
+import tailwindcss from "@tailwindcss/vite"
+import solidPlugin from "vite-plugin-solid"
 
-const channel = (() => {
-  const raw = process.env.OPENCODE_CHANNEL
-  if (raw === "dev" || raw === "beta" || raw === "prod") return raw
-  return "dev"
-})()
-
-const OPENCODE_SERVER_DIST = "../opencode/dist/node"
-
-const nodePtyPkg = `@lydell/node-pty-${process.platform}-${process.arch}`
+const mainEntry = resolve(__dirname, "src/main/index.ts")
+const preloadEntry = resolve(__dirname, "src/preload/index.ts")
+const appSrc = resolve(__dirname, "../app/src")
+const uiSrc = resolve(__dirname, "../ui/src")
+const uiComponents = resolve(__dirname, "../ui/src/components")
+const sharedSrc = resolve(__dirname, "../shared/src")
 
 export default defineConfig({
   main: {
-    define: {
-      "import.meta.env.OPENCODE_CHANNEL": JSON.stringify(channel),
-    },
     build: {
+      outDir: "dist/main",
+      lib: {
+        entry: mainEntry,
+        formats: ["cjs"],
+        fileName: () => "index.js",
+      },
       rollupOptions: {
-        input: { index: "src/main/index.ts" },
+        input: mainEntry,
       },
-      externalizeDeps: { include: [nodePtyPkg] },
+      externalizeDeps: false,
     },
-    plugins: [
-      {
-        name: "opencode:node-pty-narrower",
-        enforce: "pre",
-        resolveId(s) {
-          if (s === "@lydell/node-pty") return nodePtyPkg
-        },
-      },
-      {
-        name: "opencode:virtual-server-module",
-        enforce: "pre",
-        resolveId(id) {
-          if (id === "virtual:opencode-server") return this.resolve(`${OPENCODE_SERVER_DIST}/node.js`)
-        },
-      },
-      {
-        name: "opencode:copy-server-assets",
-        async writeBundle() {
-          for (const l of await fs.readdir(OPENCODE_SERVER_DIST)) {
-            if (!l.endsWith(".wasm")) continue
-            await fs.writeFile(`./out/main/chunks/${l}`, await fs.readFile(`${OPENCODE_SERVER_DIST}/${l}`))
-          }
-        },
-      },
-    ],
   },
   preload: {
     build: {
+      outDir: "dist/preload",
+      lib: {
+        entry: preloadEntry,
+        formats: ["cjs"],
+        fileName: () => "index.js",
+      },
       rollupOptions: {
-        input: { index: "src/preload/index.ts" },
-        output: {
-          format: "cjs",
-          entryFileNames: "[name].js",
-        },
+        input: preloadEntry,
       },
     },
   },
   renderer: {
-    plugins: [appPlugin],
-    publicDir: "../../../app/public",
-    root: "src/renderer",
-    define: {
-      "import.meta.env.VITE_OPENCODE_CHANNEL": JSON.stringify(channel),
+    root: resolve(__dirname, "src/renderer"),
+    plugins: [tailwindcss(), solidPlugin()],
+    resolve: {
+      alias: [
+        // App internal @/ imports
+        { find: "@", replacement: appSrc },
+        // Workspace package: app
+        { find: "@mimo-ai/app/index.css", replacement: resolve(appSrc, "index.css") },
+        { find: "@mimo-ai/app", replacement: appSrc },
+        // Workspace package: ui - subpath directories
+        { find: "@mimo-ai/ui/context", replacement: resolve(uiSrc, "context") },
+        { find: "@mimo-ai/ui/theme", replacement: resolve(uiSrc, "theme") },
+        { find: "@mimo-ai/ui/styles/tailwind", replacement: resolve(uiSrc, "styles/tailwind/index.css") },
+        { find: "@mimo-ai/ui/styles", replacement: resolve(uiSrc, "styles/index.css") },
+        { find: "@mimo-ai/ui/i18n", replacement: resolve(uiSrc, "i18n") },
+        { find: "@mimo-ai/ui/fonts", replacement: resolve(uiSrc, "assets/fonts") },
+        { find: "@mimo-ai/ui/audio", replacement: resolve(uiSrc, "assets/audio") },
+        { find: "@mimo-ai/ui/pierre", replacement: resolve(uiSrc, "pierre") },
+        { find: "@mimo-ai/ui/hooks", replacement: resolve(uiSrc, "hooks") },
+        // Components: @mimo-ai/ui/* -> ui/src/components/*.tsx
+        { find: "@mimo-ai/ui", replacement: uiComponents },
+        // Workspace package: shared
+        { find: "@mimo-ai/shared", replacement: sharedSrc },
+      ],
     },
     build: {
+      outDir: resolve(__dirname, "dist/renderer"),
+      target: "esnext",
       rollupOptions: {
-        input: {
-          main: "src/renderer/index.html",
-          loading: "src/renderer/loading.html",
-        },
+        input: resolve(__dirname, "src/renderer/index.html"),
       },
+    },
+    worker: {
+      format: "es",
+    },
+    server: {
+      port: 3001,
     },
   },
 })

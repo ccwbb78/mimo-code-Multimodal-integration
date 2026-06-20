@@ -1,71 +1,75 @@
 import { contextBridge, ipcRenderer } from "electron"
-import type { ElectronAPI, InitStep, SqliteMigrationProgress } from "./types"
 
-const api: ElectronAPI = {
-  killSidecar: () => ipcRenderer.invoke("kill-sidecar"),
-  installCli: () => ipcRenderer.invoke("install-cli"),
-  awaitInitialization: (onStep) => {
-    const handler = (_: unknown, step: InitStep) => onStep(step)
-    ipcRenderer.on("init-step", handler)
-    return ipcRenderer.invoke("await-initialization").finally(() => {
-      ipcRenderer.removeListener("init-step", handler)
-    })
-  },
-  getWindowConfig: () => ipcRenderer.invoke("get-window-config"),
-  consumeInitialDeepLinks: () => ipcRenderer.invoke("consume-initial-deep-links"),
-  getDefaultServerUrl: () => ipcRenderer.invoke("get-default-server-url"),
-  setDefaultServerUrl: (url) => ipcRenderer.invoke("set-default-server-url", url),
-  getWslConfig: () => ipcRenderer.invoke("get-wsl-config"),
-  setWslConfig: (config) => ipcRenderer.invoke("set-wsl-config", config),
-  getDisplayBackend: () => ipcRenderer.invoke("get-display-backend"),
-  setDisplayBackend: (backend) => ipcRenderer.invoke("set-display-backend", backend),
-  parseMarkdownCommand: (markdown) => ipcRenderer.invoke("parse-markdown", markdown),
-  checkAppExists: (appName) => ipcRenderer.invoke("check-app-exists", appName),
-  wslPath: (path, mode) => ipcRenderer.invoke("wsl-path", path, mode),
-  resolveAppPath: (appName) => ipcRenderer.invoke("resolve-app-path", appName),
-  storeGet: (name, key) => ipcRenderer.invoke("store-get", name, key),
-  storeSet: (name, key, value) => ipcRenderer.invoke("store-set", name, key, value),
-  storeDelete: (name, key) => ipcRenderer.invoke("store-delete", name, key),
-  storeClear: (name) => ipcRenderer.invoke("store-clear", name),
-  storeKeys: (name) => ipcRenderer.invoke("store-keys", name),
-  storeLength: (name) => ipcRenderer.invoke("store-length", name),
+/**
+ * Expose a minimal, secure API to the renderer process.
+ *
+ * All communication with the main process goes through this bridge.
+ * The renderer cannot access Node.js APIs directly.
+ */
+const api = {
+  // --- App info ---
+  getVersion: () => ipcRenderer.invoke("app:getVersion") as Promise<string>,
+  getName: () => ipcRenderer.invoke("app:getName") as Promise<string>,
+  getOS: () => ipcRenderer.invoke("app:getOS") as Promise<"macos" | "windows" | "linux">,
 
-  getWindowCount: () => ipcRenderer.invoke("get-window-count"),
-  onSqliteMigrationProgress: (cb) => {
-    const handler = (_: unknown, progress: SqliteMigrationProgress) => cb(progress)
-    ipcRenderer.on("sqlite-migration-progress", handler)
-    return () => ipcRenderer.removeListener("sqlite-migration-progress", handler)
+  // --- Server ---
+  getServerInfo: () =>
+    ipcRenderer.invoke("server:getInfo") as Promise<{
+      hostname: string
+      port: number
+      url: string
+      username: string
+      password: string
+    } | null>,
+
+  // --- Navigation ---
+  openExternal: (url: string) => ipcRenderer.invoke("shell:openExternal", url),
+
+  // --- File dialogs ---
+  openDirectoryPickerDialog: () => ipcRenderer.invoke("dialog:openDirectory") as Promise<string | null>,
+  openFilePickerDialog: (filters?: Electron.FileFilter[]) =>
+    ipcRenderer.invoke("dialog:openFile", { filters }) as Promise<string | null>,
+  saveFilePickerDialog: (options?: { defaultPath?: string; filters?: Electron.FileFilter[] }) =>
+    ipcRenderer.invoke("dialog:saveFile", options) as Promise<string | null>,
+
+  // --- Clipboard ---
+  readClipboardText: () => ipcRenderer.invoke("clipboard:readText") as Promise<string>,
+  writeClipboardText: (text: string) => ipcRenderer.invoke("clipboard:writeText", text),
+  readClipboardImage: () => ipcRenderer.invoke("clipboard:readImage") as Promise<string | null>,
+
+  // --- Window ---
+  setTitlebar: (theme: { mode: "light" | "dark" }) => ipcRenderer.invoke("window:setTitlebar", theme),
+
+  // --- Updates ---
+  checkUpdate: () => ipcRenderer.invoke("updater:check"),
+  installUpdate: () => ipcRenderer.invoke("updater:install"),
+  onUpdateAvailable: (callback: (info: any) => void) => {
+    ipcRenderer.on("updater:available", (_event, info) => callback(info))
   },
-  onMenuCommand: (cb) => {
-    const handler = (_: unknown, id: string) => cb(id)
-    ipcRenderer.on("menu-command", handler)
-    return () => ipcRenderer.removeListener("menu-command", handler)
+  onUpdateProgress: (callback: (progress: any) => void) => {
+    ipcRenderer.on("updater:progress", (_event, progress) => callback(progress))
   },
-  onDeepLink: (cb) => {
-    const handler = (_: unknown, urls: string[]) => cb(urls)
-    ipcRenderer.on("deep-link", handler)
-    return () => ipcRenderer.removeListener("deep-link", handler)
+  onUpdateDownloaded: (callback: (info: any) => void) => {
+    ipcRenderer.on("updater:downloaded", (_event, info) => callback(info))
+  },
+  onUpdateError: (callback: (message: string) => void) => {
+    ipcRenderer.on("updater:error", (_event, message) => callback(message))
   },
 
-  openDirectoryPicker: (opts) => ipcRenderer.invoke("open-directory-picker", opts),
-  openFilePicker: (opts) => ipcRenderer.invoke("open-file-picker", opts),
-  saveFilePicker: (opts) => ipcRenderer.invoke("save-file-picker", opts),
-  openLink: (url) => ipcRenderer.send("open-link", url),
-  openPath: (path, app) => ipcRenderer.invoke("open-path", path, app),
-  readClipboardImage: () => ipcRenderer.invoke("read-clipboard-image"),
-  showNotification: (title, body) => ipcRenderer.send("show-notification", title, body),
-  getWindowFocused: () => ipcRenderer.invoke("get-window-focused"),
-  setWindowFocus: () => ipcRenderer.invoke("set-window-focus"),
-  showWindow: () => ipcRenderer.invoke("show-window"),
-  relaunch: () => ipcRenderer.send("relaunch"),
-  getZoomFactor: () => ipcRenderer.invoke("get-zoom-factor"),
-  setZoomFactor: (factor) => ipcRenderer.invoke("set-zoom-factor", factor),
-  setTitlebar: (theme) => ipcRenderer.invoke("set-titlebar", theme),
-  loadingWindowComplete: () => ipcRenderer.send("loading-window-complete"),
-  runUpdater: (alertOnFail) => ipcRenderer.invoke("run-updater", alertOnFail),
-  checkUpdate: () => ipcRenderer.invoke("check-update"),
-  installUpdate: () => ipcRenderer.invoke("install-update"),
-  setBackgroundColor: (color: string) => ipcRenderer.invoke("set-background-color", color),
-}
+  // --- Debug ---
+  exportDebugLogs: () => ipcRenderer.invoke("debug:exportLogs"),
+  getLogPath: () => ipcRenderer.invoke("debug:getLogPath") as Promise<string | null>,
 
+  // --- Desktop flags (used by the web app) ---
+  updaterEnabled: true,
+  deepLinks: ["opencode://"],
+  wsl: false,
+} as const
+
+// Expose to renderer via window.api
 contextBridge.exposeInMainWorld("api", api)
+
+// __OPENCODE__ is defined in index.html as a writable object
+// (contextBridge creates frozen objects which breaks deep-links.ts)
+
+export type DesktopApi = typeof api

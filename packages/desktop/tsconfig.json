@@ -2,22 +2,19 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "skipLibCheck": true,
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
+    "strict": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "strict": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "emitDeclarationOnly": false,
-    "outDir": "node_modules/.ts-dist",
-    "types": ["vite/client", "node", "electron"]
+    "paths": {
+      "@/*": ["./src/renderer/*"]
+    }
   },
-  "references": [{ "path": "../app" }],
-  "include": ["src", "package.json"],
-  "exclude": ["src/**/*.test.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -420,6 +420,38 @@ export const useSessionCommands = (actions: SessionCommandContext) => {
       disabled: !params.id || visibleUserMessages().length === 0,
       onSelect: fork,
     }),
+    sessionCommand({
+      id: "session.export",
+      title: language.t("command.session.export"),
+      description: language.t("command.session.export.description"),
+      slash: "export",
+      disabled: !params.id,
+      onSelect: async () => {
+        const shareUrl = info()?.share?.url
+        if (shareUrl) {
+          await navigator.clipboard.writeText(shareUrl)
+          showToast({ title: "Session link copied to clipboard" })
+        } else {
+          showToast({ title: "Share the session first to get a link" })
+        }
+      },
+    }),
+    sessionCommand({
+      id: "session.copy",
+      title: language.t("command.session.copy"),
+      description: language.t("command.session.copy.description"),
+      slash: "copy",
+      disabled: !params.id,
+      onSelect: async () => {
+        const shareUrl = info()?.share?.url
+        if (shareUrl) {
+          await navigator.clipboard.writeText(shareUrl)
+          showToast({ title: "Session link copied to clipboard" })
+        } else {
+          showToast({ title: "Share the session first to get a link" })
+        }
+      },
+    }),
   ]
 
   const fileCmds = () => [

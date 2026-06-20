@@ -1,5 +1,6 @@
 [install]
 exact = true
+linker = "hoisted"
 
 [test]
 root = "./do-not-run-tests-from-root"

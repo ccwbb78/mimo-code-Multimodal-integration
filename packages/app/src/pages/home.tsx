@@ -1,4 +1,4 @@
-import { createMemo, For, Match, Switch } from "solid-js"
+import { createMemo, For, Match, Switch, onMount } from "solid-js"
 import { Button } from "@mimo-ai/ui/button"
 import { Logo } from "@mimo-ai/ui/logo"
 import { useLayout } from "@/context/layout"
@@ -13,6 +13,7 @@ import { DialogSelectServer } from "@/components/dialog-select-server"
 import { useServer } from "@/context/server"
 import { useGlobalSync } from "@/context/global-sync"
 import { useLanguage } from "@/context/language"
+import { DialogOnboardingAsk, shouldShowOnboarding } from "@/components/onboarding"
 
 export default function Home() {
   const sync = useGlobalSync()
@@ -28,6 +29,12 @@ export default function Home() {
       .slice()
       .sort((a, b) => (b.time.updated ?? b.time.created) - (a.time.updated ?? a.time.created))
       .slice(0, 5)
+  })
+
+  onMount(() => {
+    if (shouldShowOnboarding()) {
+      dialog.show(() => <DialogOnboardingAsk />)
+    }
   })
 
   const serverDotClass = createMemo(() => {

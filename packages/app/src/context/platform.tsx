@@ -5,7 +5,7 @@ import { ServerConnection } from "./server"
 
 type PickerPaths = string | string[] | null
 type OpenDirectoryPickerOptions = { title?: string; multiple?: boolean }
-type OpenFilePickerOptions = { title?: string; multiple?: boolean; accept?: string[]; extensions?: string[] }
+type OpenFilePickerOptions = { title?: string; multiple?: boolean; accept?: string[]; extensions?: string[]; defaultPath?: string }
 type SaveFilePickerOptions = { title?: string; defaultPath?: string }
 type UpdateInfo = { updateAvailable: boolean; version?: string }
 
@@ -37,11 +37,23 @@ export type Platform = {
   /** Send a system notification (optional deep link) */
   notify(title: string, description?: string, href?: string): Promise<void>
 
+  /** Export debug logs (desktop only) */
+  exportDebugLogs?(): Promise<string>
+
+  /** Record a fatal renderer error (desktop only) */
+  recordFatalRendererError?(error: { error: string; url: string; version?: string; platform: string; os?: string }): Promise<void> | void
+
   /** Open directory picker dialog (native on Tauri, server-backed on web) */
   openDirectoryPickerDialog?(opts?: OpenDirectoryPickerOptions): Promise<PickerPaths>
 
   /** Open native file picker dialog (Tauri only) */
   openFilePickerDialog?(opts?: OpenFilePickerOptions): Promise<PickerPaths>
+
+  /** Open attachment picker with per-file callback (desktop only) */
+  openAttachmentPickerDialog?(
+    opts?: OpenFilePickerOptions,
+    onFile?: (file: File) => Promise<void> | void,
+  ): Promise<void>
 
   /** Save file picker dialog (Tauri only) */
   saveFilePickerDialog?(opts?: SaveFilePickerOptions): Promise<string | null>
@@ -79,8 +91,23 @@ export type Platform = {
   /** Parse markdown to HTML using native parser (desktop only, returns unprocessed code blocks) */
   parseMarkdown?(markdown: string): Promise<string>
 
+  /** Run a desktop-specific menu action (desktop only) */
+  runDesktopMenuAction?(action: string): Promise<void> | void
+
+  /** Subscribe to desktop menu actions triggered from the native menu bar (desktop only) */
+  onMenuAction?(callback: (action: string) => void): (() => void) | void
+
+  /** Get the original platform path for a file picked via the attachment picker (desktop only) */
+  getPathForFile?(file: File): string | undefined
+
   /** Webview zoom level (desktop only) */
   webviewZoom?: Accessor<number>
+
+  /** Get whether pinch-to-zoom is enabled (desktop only) */
+  getPinchZoomEnabled?(): Promise<boolean>
+
+  /** Set whether pinch-to-zoom is enabled (desktop only) */
+  setPinchZoomEnabled?(enabled: boolean): Promise<void> | void
 
   /** Check if an editor app exists (desktop only) */
   checkAppExists?(appName: string): Promise<boolean>

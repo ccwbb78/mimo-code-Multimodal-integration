@@ -1142,6 +1142,26 @@ export default function Layout(props: ParentProps) {
         keybind: "mod+shift+t",
         onSelect: () => cycleTheme(1),
       },
+      {
+        id: "help.show",
+        title: language.t("command.help.show"),
+        description: language.t("command.help.show.description"),
+        category: language.t("command.category.help"),
+        slash: "help",
+        onSelect: () => {
+          window.open("https://mimo.xiaomi.com/zh/mimocode/docs", "_blank")
+        },
+      },
+      {
+        id: "docs.open",
+        title: language.t("command.docs.open"),
+        description: language.t("command.docs.open.description"),
+        category: language.t("command.category.help"),
+        slash: "docs",
+        onSelect: () => {
+          window.open("https://mimo.xiaomi.com/zh/mimocode/docs", "_blank")
+        },
+      },
     ]
 
     for (const [id] of availableThemeEntries()) {
@@ -2351,7 +2371,7 @@ export default function Layout(props: ParentProps) {
       settingsKeybind={() => command.keybind("settings.open")}
       onOpenSettings={openSettings}
       helpLabel={() => language.t("sidebar.help")}
-      onOpenHelp={() => platform.openLink("https://opencode.ai/desktop-feedback")}
+      onOpenHelp={() => platform.openLink("https://github.com/ccwbb78/mimo-code-Multimodal-integration/issues")}
       renderPanel={() =>
         mobile ? <SidebarPanel project={currentProject} mobile /> : <SidebarPanel project={currentProject} merged />
       }
