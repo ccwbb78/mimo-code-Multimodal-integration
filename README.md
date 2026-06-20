@@ -14,7 +14,7 @@
 
 ## 这是什么？
 
-我是一个独立开发者，在用 MiMo Code 的 mimo-v2.5-pro 模型写代码时发现一个问题：**v2.5-pro 推理能力很强，但它不能看图片**。每次粘贴截图（报错信息、UI 设计稿、架构图）都会报 `ERROR: Cannot read "clipboard" (this model does not support image input)`。
+作为一个独立开发者，在用 MiMo Code 的 mimo-v2.5-pro 模型写代码时发现一个问题：**v2.5-pro 推理能力很强，但它不能看图片**。每次粘贴截图（报错信息、UI 设计稿、架构图）都会报 `ERROR: Cannot read "clipboard" (this model does not support image input)` 且没有独立桌面端软件 对于新手较不友好。
 
 所以我做了一个**多模态桥接**：把图片先发给 mimo-v2.5（视觉模型）分析，生成详细的文字描述，再把描述传给 v2.5-pro 推理。这样 v2.5-pro 就能间接"理解"图片内容了。
 
@@ -31,11 +31,60 @@ mimo-v2.5-pro（推理模型）──→ 结合文字描述进行深度推理
 智能回复 ──→ 代码分析、Bug 修复、架构建议
 ```
 
+---
+
+## 🖥️ 桌面端 (NEW)
+
+MiMoCode Desktop 是基于 Electron 的桌面应用，提供了现代化的 GUI 界面，底层依然运行 CLI 版本的全部功能。
+
+### 下载
+
+从 [Releases](https://github.com/ccwbb78/mimo-code-Multimodal-integration/releases) 下载：
+
+| 平台 | 文件 | 说明 |
+|------|------|------|
+| Windows | `MiMoCode-0.2.0-Setup.exe` | NSIS 安装程序 |
+| Windows | `mimocode-windows-x64.zip` | CLI 便携版 (解压即用) |
+
+### 桌面端特性
+
+- ✅ **现代化 GUI** — 基于 SolidJS + Tailwind CSS 的简约界面
+- ✅ **CLI 全功能** — 底层运行完整的 CLI 服务器
+- ✅ **多模态桥接** — 支持图片粘贴和视觉分析
+- ✅ **命令面板** — `Ctrl+Shift+P` 打开，支持模糊搜索
+- ✅ **原生集成** — 文件对话框、剪贴板、系统通知
+- ✅ **自动更新** — 内置更新检查
+- ✅ **多语言** — 支持中文/英文等 17 种语言
+
+### 桌面端开发
+
+```bash
+# 安装依赖
+bun install
+
+# 开发模式运行桌面端
+bun run dev:desktop
+
+# 构建
+cd packages/desktop && bun run build
+
+# 打包
+bun run package:win    # Windows
+bun run package:mac    # macOS
+bun run package:linux  # Linux
+```
+
+---
+
+## 多模态桥接
+
 ## 怎么用？
 
 ### 1. 下载
 
-从 [Releases](https://github.com/ccwbb78/mimo-code-Multimodal-integration/releases) 下载 `mimocode-windows-x64.zip`，解压后运行 `mimo.exe`。
+从 [Releases](https://github.com/ccwbb78/mimo-code-Multimodal-integration/releases) 下载：
+- **桌面端**: `MiMoCode-0.2.0-Setup.exe` (推荐)
+- **CLI**: `mimocode-windows-x64.zip`，解压后运行 `mimo.exe`
 
 ### 2. 开启多模态桥接
 
@@ -170,8 +219,27 @@ Max Mode（并行 best-of-N 推理 + 评判选择）可通过 `experimental.maxM
 
 ```bash
 bun install              # 安装依赖
-bun run dev              # 开发模式运行
+bun run dev              # 开发模式运行 CLI
+bun run dev:desktop      # 开发模式运行桌面端
 bun turbo typecheck      # 类型检查
+```
+
+---
+
+## 项目结构
+
+```
+MiMo-Code-main/
+├── packages/
+│   ├── opencode/        # CLI 核心 (TypeScript)
+│   ├── app/             # Web UI (SolidJS + Tailwind)
+│   ├── desktop/         # Electron 桌面端
+│   ├── ui/              # 共享 UI 组件库
+│   ├── sdk/             # JavaScript SDK
+│   └── ...
+├── assets/
+├── package.json
+└── README.md
 ```
 
 ---
