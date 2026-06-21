@@ -4,6 +4,7 @@
   "description": "MiMoCode Desktop - AI-powered development tool",
   "author": "MiMoCode <mimo@xiaomi.com>",
   "license": "MIT",
+  "homepage": "https://mimo.xiaomi.com",
   "private": true,
   "main": "./dist/main/index.js",
   "scripts": {
