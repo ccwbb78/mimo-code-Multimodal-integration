@@ -4,7 +4,7 @@ const config: Configuration = {
   appId: "com.mimo.desktop",
   productName: "MiMoCode",
   directories: {
-    output: "C:/mimocode-build/desktop",
+    output: "release",
     buildResources: "build",
   },
   files: ["dist/**/*"],
