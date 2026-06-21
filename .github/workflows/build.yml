@@ -9,10 +9,12 @@ on:
         required: false
         default: ''
 
-  # 推送标签时触发
+  # 推送标签或分支时触发
   push:
     tags:
       - 'v*'
+    branches:
+      - 'feature/cross-platform-build'
 
 jobs:
   # ===========================================
