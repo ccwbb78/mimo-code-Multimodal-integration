@@ -1382,8 +1382,6 @@ export async function multimodalBridge(
   // No images — return messages unchanged
   if (imageParts.length === 0) return msgs
 
-  console.log(`[multimodal bridge] sending ${imageParts.length} image(s) to vision model for analysis`)
-
   // Build vision content array for the vision model
   const visionContent = imageParts.map((img) => ({
     type: "image" as const,

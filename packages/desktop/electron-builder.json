@@ -2,7 +2,7 @@
   "appId": "com.mimo.desktop",
   "productName": "MiMoCode",
   "directories": {
-    "output": "C:/mimocode-build/release",
+    "output": "C:/mimocode-build/desktop",
     "buildResources": "build"
   },
   "files": [
@@ -11,28 +11,31 @@
   "npmRebuild": false,
   "extraResources": [
     {
-      "from": "../opencode/dist/mimocode-windows-x64/bin/",
+      "from": "../opencode/dist/mimocode-${os}-${arch}/bin/",
       "to": "bin/",
       "filter": ["mimo*"]
     }
   ],
+  "asar": true,
   "mac": {
     "target": ["dmg", "zip"],
-    "icon": "build/icon.icns"
+    "icon": "build/icon.icns",
+    "artifactName": "MiMoCode-${version}-${arch}.${ext}"
   },
   "win": {
-    "target": ["nsis"],
-    "icon": "build/icon.ico"
+    "target": ["nsis", "portable"],
+    "icon": "build/icon.ico",
+    "artifactName": "MiMoCode-${version}-${arch}.${ext}"
   },
   "linux": {
     "target": ["AppImage", "deb"],
-    "icon": "build/icon.png"
+    "icon": "build/icon.png",
+    "artifactName": "MiMoCode-${version}-${arch}.${ext}"
   },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true
-  },
-  "artifactName": "MiMoCode-${version}-Setup.${ext}"
+  }
 }

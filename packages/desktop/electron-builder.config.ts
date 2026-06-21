@@ -4,13 +4,13 @@ const config: Configuration = {
   appId: "com.mimo.desktop",
   productName: "MiMoCode",
   directories: {
-    output: "release",
+    output: "C:/mimocode-build/desktop",
     buildResources: "build",
   },
   files: ["dist/**/*"],
   extraResources: [
     {
-      from: "../opencode/bin/",
+      from: "../opencode/dist/mimocode-${os}-${arch}/bin/",
       to: "bin/",
       filter: ["mimo*"],
     },

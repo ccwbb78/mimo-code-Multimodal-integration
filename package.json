@@ -17,7 +17,14 @@
     "prepare": "husky",
     "random": "echo 'Random script'",
     "hello": "echo 'Hello World!'",
-    "test": "echo 'do not run tests from root' && exit 1"
+    "test": "echo 'do not run tests from root' && exit 1",
+    "build:cli:mac": "cd packages/opencode && TARGET_OS=darwin TARGET_ARCH=all bun run script/build.ts",
+    "build:cli:linux": "cd packages/opencode && TARGET_OS=linux TARGET_ARCH=all bun run script/build.ts",
+    "build:desktop:mac": "cd packages/desktop && bun run build && bun run package:mac",
+    "build:desktop:linux": "cd packages/desktop && bun run build && bun run package:linux",
+    "build:cross-platform": "bash build-cross-platform.sh",
+    "build:cross-platform:win": "build-cross-platform.bat",
+    "verify:build": "bash verify-build.sh"
   },
   "workspaces": {
     "packages": [
