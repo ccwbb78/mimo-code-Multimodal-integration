@@ -198,8 +198,8 @@ if (!skipInstall) {
 for (const item of targets) {
   const name = [
     BINARY_PREFIX,
-    // changing to win32 flags npm for some reason
-    item.os === "win32" ? "windows" : item.os,
+    // Use "win" to match electron-builder's ${os} template variable
+    item.os === "win32" ? "win" : item.os,
     item.arch,
     item.avx2 === false ? "baseline" : undefined,
     item.abi === undefined ? undefined : item.abi,

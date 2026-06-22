@@ -147,7 +147,7 @@ jobs:
         with:
           name: windows-build
           path: |
-            packages/opencode/dist/mimocode-windows-*/
+            packages/opencode/dist/mimocode-win-*/
             packages/desktop/release/*.exe
           retention-days: 30
 
