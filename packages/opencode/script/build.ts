@@ -192,8 +192,15 @@ if (privateEntrypoints.length) {
 
 const binaries: Record<string, string> = {}
 if (!skipInstall) {
-  await $`bun install --os="*" --cpu="*" @opentui/core@${pkg.dependencies["@opentui/core"]}`
-  await $`bun install --os="*" --cpu="*" @parcel/watcher@${pkg.dependencies["@parcel/watcher"]}`
+  // When building a single target, only install native deps for the current platform
+  // to avoid downloading binaries for all platforms (which can fail in CI)
+  if (singleFlag) {
+    await $`bun install @opentui/core@${pkg.dependencies["@opentui/core"]}`
+    await $`bun install @parcel/watcher@${pkg.dependencies["@parcel/watcher"]}`
+  } else {
+    await $`bun install --os="*" --cpu="*" @opentui/core@${pkg.dependencies["@opentui/core"]}`
+    await $`bun install --os="*" --cpu="*" @parcel/watcher@${pkg.dependencies["@parcel/watcher"]}`
+  }
 }
 for (const item of targets) {
   const name = [
