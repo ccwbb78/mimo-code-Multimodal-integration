@@ -18,12 +18,11 @@ on:
 
 jobs:
   # ===========================================
-  # 构建 macOS 版本
+  # 构建 macOS CLI + Desktop
   # ===========================================
   build-macos:
     runs-on: macos-latest
     name: Build macOS
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,10 +40,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build CLI for macOS
+      - name: Build CLI for macOS (all targets)
         run: |
           cd packages/opencode
-          bun run script/build.ts --single
+          bun run script/build.ts
 
       - name: Build Desktop for macOS
         run: |
@@ -52,23 +51,28 @@ jobs:
           bun run build
           bun run package:mac
 
-      - name: Upload macOS artifacts
+      - name: Upload macOS CLI binaries
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build
+          name: macos-cli-binaries
+          path: packages/opencode/dist/mimocode-darwin-*.zip
+          retention-days: 30
+
+      - name: Upload macOS Desktop installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-desktop
           path: |
-            packages/opencode/dist/mimocode-darwin-*/
             packages/desktop/release/*.dmg
             packages/desktop/release/*.zip
           retention-days: 30
 
   # ===========================================
-  # 构建 Linux 版本
+  # 构建 Linux CLI + Desktop
   # ===========================================
   build-linux:
     runs-on: ubuntu-latest
     name: Build Linux
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -86,10 +90,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build CLI for Linux
+      - name: Build CLI for Linux (all targets)
         run: |
           cd packages/opencode
-          bun run script/build.ts --single
+          bun run script/build.ts
 
       - name: Build Desktop for Linux
         run: |
@@ -97,23 +101,28 @@ jobs:
           bun run build
           bun run package:linux
 
-      - name: Upload Linux artifacts
+      - name: Upload Linux CLI binaries
         uses: actions/upload-artifact@v4
         with:
-          name: linux-build
+          name: linux-cli-binaries
+          path: packages/opencode/dist/mimocode-linux-*.tar.gz
+          retention-days: 30
+
+      - name: Upload Linux Desktop installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-desktop
           path: |
-            packages/opencode/dist/mimocode-linux-*/
             packages/desktop/release/*.AppImage
             packages/desktop/release/*.deb
           retention-days: 30
 
   # ===========================================
-  # 构建 Windows 版本
+  # 构建 Windows CLI + Desktop
   # ===========================================
   build-windows:
     runs-on: windows-latest
     name: Build Windows
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -131,10 +140,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build CLI for Windows
+      - name: Build CLI for Windows (all targets)
         run: |
           cd packages/opencode
-          bun run script/build.ts --single
+          bun run script/build.ts
 
       - name: Build Desktop for Windows
         run: |
@@ -142,59 +151,19 @@ jobs:
           bun run build
           bun run package:win
 
-      - name: Upload Windows artifacts
+      - name: Upload Windows CLI binaries
         uses: actions/upload-artifact@v4
         with:
-          name: windows-build
-          path: |
-            packages/opencode/dist/mimocode-win-*/
-            packages/desktop/release/*.exe
+          name: windows-cli-binaries
+          path: packages/opencode/dist/mimocode-windows-*.zip
           retention-days: 30
 
-  # ===========================================
-  # 汇总所有构建产物
-  # ===========================================
-  collect-artifacts:
-    runs-on: ubuntu-latest
-    name: Collect All Artifacts
-    needs: [build-macos, build-linux, build-windows]
-
-    steps:
-      - name: Download macOS artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: macos-build
-          path: ./output/macos
-
-      - name: Download Linux artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: linux-build
-          path: ./output/linux
-
-      - name: Download Windows artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-build
-          path: ./output/windows
-
-      - name: List all artifacts
-        run: |
-          echo "=== macOS ==="
-          find ./output/macos -type f -name "*.dmg" -o -name "*.zip" -o -name "mimo" | head -20
-          echo ""
-          echo "=== Linux ==="
-          find ./output/linux -type f -name "*.AppImage" -o -name "*.deb" -o -name "mimo" | head -20
-          echo ""
-          echo "=== Windows ==="
-          find ./output/windows -type f -name "*.exe" -o -name "mimo.exe" | head -20
-
-      - name: Upload all artifacts
+      - name: Upload Windows Desktop installer
         uses: actions/upload-artifact@v4
         with:
-          name: all-platforms
-          path: ./output/
-          retention-days: 90
+          name: windows-desktop
+          path: packages/desktop/release/*.exe
+          retention-days: 30
 
   # ===========================================
   # 创建 Release (仅在推送标签时)
@@ -202,25 +171,60 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     name: Create Release
-    needs: [collect-artifacts]
+    needs: [build-macos, build-linux, build-windows]
     if: startsWith(github.ref, 'refs/tags/v')
-
     steps:
-      - name: Download all artifacts
+      - name: Download macOS CLI binaries
         uses: actions/download-artifact@v4
         with:
-          name: all-platforms
+          name: macos-cli-binaries
           path: ./release
+
+      - name: Download Linux CLI binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-cli-binaries
+          path: ./release
+
+      - name: Download Windows CLI binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-cli-binaries
+          path: ./release
+
+      - name: Download macOS Desktop installer
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-desktop
+          path: ./release
+
+      - name: Download Linux Desktop installer
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-desktop
+          path: ./release
+
+      - name: Download Windows Desktop installer
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-desktop
+          path: ./release
+
+      - name: List all release files
+        run: find ./release -type f | sort
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./release/macos/**/*.dmg
-            ./release/macos/**/*.zip
-            ./release/linux/**/*.AppImage
-            ./release/linux/**/*.deb
-            ./release/windows/**/*.exe
+            ./release/mimocode-darwin-*.zip
+            ./release/mimocode-linux-*.tar.gz
+            ./release/mimocode-win-*.zip
+            ./release/MiMoCode-*.dmg
+            ./release/MiMoCode-*.zip
+            ./release/MiMoCode-*.AppImage
+            ./release/MiMoCode-*.deb
+            ./release/MiMoCode-*.exe
           draft: false
           prerelease: false
         env:
