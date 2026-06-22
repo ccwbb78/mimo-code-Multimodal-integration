@@ -234,7 +234,7 @@ for (const item of targets) {
       target: name.replace(BINARY_PREFIX, "bun") as any,
       outfile: `dist/${name}/bin/mimo`,
       execArgv: [`--user-agent=mimocode/${Script.version}`, "--use-system-ca", "--"],
-      windows: {},
+      windows: { defer: false },
     },
     files: embeddedFileMap ? { "opencode-web-ui.gen.ts": embeddedFileMap } : {},
     entrypoints: ["./src/index.ts", parserWorker, workerPath, ...(embeddedFileMap ? ["opencode-web-ui.gen.ts"] : []), ...privateEntrypoints],
@@ -265,6 +265,19 @@ for (const item of targets) {
   // Ensure binary has execute permission on macOS/Linux
   if (item.os !== "win32") {
     await $`chmod +x dist/${name}/bin/mimo`
+  }
+  // Bundle VC++ runtime DLLs for Windows to avoid missing DLL errors on other machines
+  if (item.os === "win32") {
+    const bunDir = path.dirname(process.execPath)
+    const dlls = ["bun-windows-x64.dll", "vcruntime140.dll", "msvcp140.dll", "vcruntime140_1.dll"]
+    for (const dll of dlls) {
+      const src = path.join(bunDir, dll)
+      const dest = `dist/${name}/bin/${dll}`
+      if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest)
+        console.log(`Bundled ${dll}`)
+      }
+    }
   }
   await Bun.file(`dist/${name}/README.md`).write(
     `This is the ${item.os}-${item.arch} binary for [@mimo-ai/cli](https://www.npmjs.com/package/@mimo-ai/cli). Install that package directly.\n`,
