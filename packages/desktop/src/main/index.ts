@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from "electron"
+import { app, BrowserWindow, shell, dialog } from "electron"
 import { createWindow, getMainWindow } from "./windows"
 
 const log = {
@@ -64,6 +64,10 @@ app.whenReady().then(async () => {
     })
   } catch (error) {
     log.error("Failed to start CLI server:", error)
+    dialog.showErrorBox(
+      "启动失败",
+      `无法启动 MiMoCode CLI 服务。\n\n错误信息: ${error instanceof Error ? error.message : String(error)}\n\n请确保应用已正确安装，或尝试重新安装。`
+    )
     app.quit()
   }
 })

@@ -262,6 +262,10 @@ for (const item of targets) {
   }
 
   await $`rm -rf ./dist/${name}/bin/tui`
+  // Ensure binary has execute permission on macOS/Linux
+  if (item.os !== "win32") {
+    await $`chmod +x dist/${name}/bin/mimo`
+  }
   await Bun.file(`dist/${name}/README.md`).write(
     `This is the ${item.os}-${item.arch} binary for [@mimo-ai/cli](https://www.npmjs.com/package/@mimo-ai/cli). Install that package directly.\n`,
   )

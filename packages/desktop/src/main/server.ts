@@ -1,7 +1,10 @@
 import { spawn, type ChildProcess } from "child_process"
 import { join } from "path"
 import { existsSync } from "fs"
+import { chmodSync } from "fs"
 import { app } from "electron"
+
+const binName = process.platform === "win32" ? "mimo.exe" : "mimo"
 
 // Use a simple logger to avoid electron-log CJS/ESM interop issues
 const log = {
@@ -190,14 +193,16 @@ export class ServerManager {
 
     // 2. Bundled binary (production)
     if (app.isPackaged) {
-      // Try mimo.exe first, then mimo.cmd, then mimo
       for (const name of isWindows ? ["mimo.exe", "mimo.cmd", "mimo"] : ["mimo"]) {
         const bundled = join(process.resourcesPath, "bin", name)
         if (existsSync(bundled)) {
+          // Ensure executable permission on macOS/Linux
+          if (!isWindows) {
+            try { chmodSync(bundled, 0o755) } catch {}
+          }
           return { command: bundled, args: serveArgs }
         }
       }
-      // Log error for debugging
       log.error("CLI binary not found in resources:", process.resourcesPath)
     }
 
@@ -214,6 +219,9 @@ export class ServerManager {
       binName
     )
     if (existsSync(siblingBin)) {
+      if (!isWindows) {
+        try { chmodSync(siblingBin, 0o755) } catch {}
+      }
       return { command: siblingBin, args: serveArgs }
     }
 
