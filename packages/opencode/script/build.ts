@@ -166,6 +166,9 @@ const targets = singleFlag
     })
   : allTargets
 
+console.log(`[build] singleFlag=${singleFlag} platform=${process.platform} arch=${process.arch}`)
+console.log(`[build] targets:`, targets.map((t) => `${t.os}-${t.arch}${t.avx2 === false ? "-baseline" : ""}${t.abi ? "-" + t.abi : ""}`))
+
 await $`rm -rf dist`
 
 const privateDir = path.join(dir, "src", "private")
